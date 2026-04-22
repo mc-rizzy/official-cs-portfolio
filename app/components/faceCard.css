@@ -1,8 +1,6 @@
-
-
 .cardContainer{
     position:relative;
-    width: 500px;
+    width: 100%;
     aspect-ratio: 1/1;
     align-items: center;
     justify-content: center;
@@ -25,4 +23,19 @@
     transform: scale(1.1);
     pointer-events: none;
     transition: transform 0.15s ease-out;
+}
+
+.fadeIn{
+    animation: fadeIn 1s ease 1;
+}
+
+@keyframes fadeIn{
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

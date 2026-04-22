@@ -9,6 +9,28 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
+.heroText{
+    /* display: flex;
+    align-items: flex-start;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: baseline; */
+}
+
+.heroText span{
+    position:absolute;
+    display: inline-block;
+    white-space: pre;
+    top: 0;
+    left: 0;
+}
+.funLetter{
+    transition: transform 0.15s ease-out;
+}
+.funLetter:hover{
+    transform: scale(1.2);
+}
+
 .hero > div{
     justify-self: center;
     align-self: center;

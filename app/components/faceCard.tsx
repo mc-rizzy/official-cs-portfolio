@@ -1,8 +1,13 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useRef } from "react";
 
 import "./faceCard.css";
-const FaceCard = ({ src }: { src: string }) => {
+
+interface FaceCardProps {
+    src: string;
+}
+
+const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src }, ref) => {
 
     const cardContentRef = useRef<HTMLDivElement | null>(null);
     const cardContainerRef = useRef<HTMLDivElement | null>(null);
@@ -41,13 +46,13 @@ const FaceCard = ({ src }: { src: string }) => {
     }, [cardContentRef, cardContainerRef, profileImgRef]);
 
     return (
-        <div ref={cardContainerRef} className="cardContainer">
+        <div ref={cardContainerRef} className="cardContainer fadeIn">
             <div ref={cardContentRef} className="cardContent">
                 <img ref={profileImgRef} className="profileImg" src={src} alt="Team Member" />
             </div>
 
         </div>
     );
-};
+});
 
 export default FaceCard;
