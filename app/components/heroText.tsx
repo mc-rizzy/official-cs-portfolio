@@ -3,7 +3,7 @@ import { JSX, useCallback, useEffect, useRef, useState } from "react";
 import "../home.css";
 
 
-export default function HeroText() {
+export default function HeroText( {mouse}: {mouse: React.MutableRefObject<{x: number, y: number}>} ) {
 
     const heroTextRef = useRef<HTMLDivElement | null>(null);
     const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -11,7 +11,6 @@ export default function HeroText() {
     const [windowSize, setWindowSize] = useState<{width: number, height: number}>({ width: 0, height: 0 });
     const initialized = useRef(false);
 	const [moveLetters, setMoveLetters] = useState(false);
-	const mouse = useRef({x: 0, y: 0});
     letterRefs.current = [];
 
     const textData = [
@@ -114,26 +113,26 @@ export default function HeroText() {
         let animationFrame: number;
 		const frame = () => {
 			particleRefs.current.forEach((particle) => {
-				particle.physics(mouse.current);
+				particle.physics({ x: mouse.current.x, y: mouse.current.y-(heroTextRef.current?.getBoundingClientRect().top || 0) });
 				particle.update();
 			});
 			animationFrame = requestAnimationFrame(frame);
 		};
 		animationFrame = requestAnimationFrame(frame);
 
-		const handleMouseMove = (event: any) => {
-			if (!heroTextRef.current) return;
-			const rect = heroTextRef.current.getBoundingClientRect();
+		// const handleMouseMove = (event: any) => {
+		// 	if (!heroTextRef.current) return;
+		// 	const rect = heroTextRef.current.getBoundingClientRect();
 
-			mouse.current.x = event.clientX;
-			mouse.current.y = event.clientY - rect.top;
-		};
+		// 	mouse.current.x = event.clientX;
+		// 	mouse.current.y = event.clientY - rect.top;
+		// };
 
-		window.addEventListener('mousemove', handleMouseMove);
+		// window.addEventListener('mousemove', handleMouseMove);
 
 		return () => {
 			cancelAnimationFrame(animationFrame);
-			window.removeEventListener('mousemove', handleMouseMove);
+			// window.removeEventListener('mousemove', handleMouseMove);
 		};
     },[initialized, moveLetters]);
 

@@ -1,17 +1,60 @@
 "use client";
-import { forwardRef, useEffect, useRef } from "react";
-
+import { forwardRef, MutableRefObject, useEffect, useRef, useState } from "react";
+import spritePreloader from "./spritePreloader";
 import "./faceCard.css";
 
 interface FaceCardProps {
     src: string;
+    mouse: MutableRefObject<{ x: number; y: number }>; 
 }
 
-const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src }, ref) => {
-
+const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src, mouse }, ref) => {
     const cardContentRef = useRef<HTMLDivElement | null>(null);
     const cardContainerRef = useRef<HTMLDivElement | null>(null);
     const profileImgRef = useRef<HTMLImageElement | null>(null);
+    const fireMouse = useRef<HTMLDivElement | null>(null);
+
+    const [currentFrame, setCurrentFrame] = useState(0);
+    const animationIntervalRef = useRef(null) as any;
+    const fireMouseMoveIntervalRef = useRef(null) as any;
+    const fireMousePositionRef = useRef({ x: 0, y: 0 });
+    
+    const frames = spritePreloader('/cursor/fire.png', 32, 32, 6);
+
+    const showCursor = () => {
+        if (!animationIntervalRef.current){
+            animationIntervalRef.current = setInterval(() => {
+                setCurrentFrame((prev) => (prev + 1) % frames.length);
+            }, 100);
+        }
+
+        let offsetY = cardContainerRef.current?.getBoundingClientRect().top || 0;
+        let lerpRate = 0.2;
+        fireMousePositionRef.current = { x: mouse.current.x, y: mouse.current.y - offsetY };
+
+        const updatePosition = () => {
+            if (!fireMouse.current) return;
+            let newX = fireMousePositionRef.current.x + (mouse.current.x - fireMousePositionRef.current.x) * lerpRate;
+            let newY = fireMousePositionRef.current.y + (mouse.current.y - fireMousePositionRef.current.y - offsetY) * lerpRate;
+
+            fireMouse.current.style.setProperty('left', `${newX}px`);
+            fireMouse.current.style.setProperty('top', `${newY}px`);
+
+            fireMousePositionRef.current = { x: newX, y: newY };
+            fireMouseMoveIntervalRef.current = requestAnimationFrame(updatePosition);
+        };
+
+        if (!fireMouseMoveIntervalRef.current)
+            fireMouseMoveIntervalRef.current = requestAnimationFrame(updatePosition);
+    };
+
+    const hideCursor = () => {
+        clearInterval(animationIntervalRef.current);
+        cancelAnimationFrame(fireMouseMoveIntervalRef.current);
+        animationIntervalRef.current = null;
+        fireMouseMoveIntervalRef.current = null;
+        setCurrentFrame(0);
+    };
 
     useEffect(() => {
         cardContainerRef.current?.addEventListener("mousemove", (e) => {
@@ -45,14 +88,22 @@ const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src }, ref) => {
         });
     }, [cardContentRef, cardContainerRef, profileImgRef]);
 
-    return (
-        <div ref={cardContainerRef} className="cardContainer fadeIn">
-            <div ref={cardContentRef} className="cardContent">
+    return (<>
+        <div ref={cardContainerRef} className="cardContainer fadeIn" onMouseEnter={showCursor} onMouseLeave={hideCursor}>
+            <div ref={cardContentRef} className="cardContent" 
+            onMouseEnter={()=>{fireMouse.current?.style.setProperty('opacity', '1');}}
+            onMouseLeave={()=>{fireMouse.current?.style.setProperty('opacity', '0')}} >
                 <img ref={profileImgRef} className="profileImg" src={src} alt="Team Member" />
             </div>
-
         </div>
-    );
+        {frames[currentFrame] && (
+            <div 
+                ref={fireMouse} 
+                className="fireMouse pixelPerfect" 
+                style={{ backgroundImage: `url(${frames[currentFrame]})` }}
+            />
+        )}
+    </>);
 });
 
 export default FaceCard;

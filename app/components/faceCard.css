@@ -13,6 +13,7 @@
     /* background-color: #1e1e1e; */
     transition: transform 0.1s ease-out;
     overflow: hidden;
+    cursor: none;
 }
 .profileImg{
     width: 100%;
@@ -38,4 +39,21 @@
         opacity: 1;
         transform: scale(1);
     }
+}
+
+.pixelPerfect {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.fireMouse{
+    position:fixed;
+    pointer-events: none;
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+    transform: translate(-50%, -50%);
 }

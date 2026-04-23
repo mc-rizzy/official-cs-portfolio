@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import dynamic from 'next/dynamic';
 import FaceCard from "./components/faceCard";
@@ -12,13 +12,26 @@ const HeroText = dynamic(() => import('./components/heroText'), {
 
 export default function Home() {
 
-  const faceCardRef = useRef<HTMLDivElement | null>(null);
+  const mouse = useRef({x: 0, y: 0});
+
+  useEffect(() => {
+    const handleMouseMove = (event: any) => {
+			mouse.current.x = event.clientX;
+			mouse.current.y = event.clientY;
+		};
+
+		window.addEventListener('mousemove', handleMouseMove);
+
+		return () => {
+			window.removeEventListener('mousemove', handleMouseMove);
+		};
+  },[]);
 
   return (<>
   {/* About me, basic info. Replace later */}
     <section className="hero">
-      <FaceCard ref={faceCardRef} src="profile/faceCard.jpg" />
-      <HeroText />
+      <FaceCard src="profile/faceCard.jpg" mouse={mouse}/>
+      <HeroText mouse={mouse}/>
     </section>
 
     <section className="hero">Technologies</section>
