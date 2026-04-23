@@ -1,5 +1,5 @@
 "use client";   
-import { useCallback, useEffect, useRef, useState } from "react";
+import { JSX, useCallback, useEffect, useRef, useState } from "react";
 import "../home.css";
 
 
@@ -173,7 +173,7 @@ export default function HeroText() {
     return (<>
       	<div ref={heroTextRef} className="heroText">
 			{textData.map((textObj, p) => {
-				const Tag = textObj.type;
+				const Tag = textObj.type as keyof JSX.IntrinsicElements;
 
 				return <Tag key={p}>{
 					Array.from(textObj.content).map((letter, i) => {
