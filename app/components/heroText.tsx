@@ -9,16 +9,18 @@ interface HeroTextProps {
 
 const textData = [
   { content: "Hi, I'm ", type: "h1" as const, className: "hero-greeting", newLine: false },
-  { content: "Cracked", type: "h1" as const, mode: "highlight", className: "hero-name", newLine: true },
-  { content: "Haha lol, no actually my name is Caleb.", type: "p" as const, newLine: true },
-  { content: "I'm a programmer", type: "p" as const, className: "hero-subheading", newLine: true },
-  { content: "with a specialty in AI and Robotics.", type: "p" as const, className: "hero-subheading", newLine: true },
-  { content: "Scroll down for more info! :D", type: "p" as const, className: "hero-scroller", newLine: true },
+  { content: "Caleb", type: "h1" as const, mode: "highlight", className: "hero-name", newLine: true },
+  { content: "Dual Computer Science x Business Analytics major", type: "p" as const, newLine: true },
+  { content: "Bridging raw data infrastructure to executive strategy", type: "p" as const, className: "hero-subheading", newLine: true },
+  { content: "Clean automated production-grade data pipelines", type: "p" as const, className: "hero-subheading", newLine: true },
+  { content: "Messy corporate datasets -> optimize metrics and revenue", type: "p" as const, className: "hero-scroller", newLine: true },
+  { content: "Seeking Analytics Engineering role", type: "p" as const, className: "hero-scroller", newLine: true },
 ];
 
-function InteractiveLetter({ letter, mode, mouse, containerRef }: { 
+function InteractiveLetter({ letter, type, mode, mouse, containerRef }: { 
   letter: string; 
   mode?: string; 
+  type?: string;
   mouse: React.MutableRefObject<{ x: number; y: number }>;
   containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
@@ -43,11 +45,9 @@ function InteractiveLetter({ letter, mode, mouse, containerRef }: {
       const rect = letterRef.current.getBoundingClientRect();
       const containerRect = containerRef.current.getBoundingClientRect();
 
-      // letter center relative to viewport
       const letterCenterX = rect.left + rect.width / 2;
       const letterCenterY = rect.top + rect.height / 2;
 
-      // mouse coordinates adjusted to viewport
       const currentMouseX = mouse.current.x;
       const currentMouseY = mouse.current.y;
 
@@ -60,7 +60,7 @@ function InteractiveLetter({ letter, mode, mouse, containerRef }: {
 
       if (distance < mouseRadius && distance > 0) {
         const force = (mouseRadius - distance) / mouseRadius;
-        // Pushes letters away from mouse position
+
         animX.set((dx / distance) * force * mouseForce);
         animY.set((dy / distance) * force * mouseForce);
       } else {
@@ -75,7 +75,6 @@ function InteractiveLetter({ letter, mode, mouse, containerRef }: {
     return () => cancelAnimationFrame(animationFrameId);
   }, [mouse, containerRef, animX, animY]);
 
-  // Initial explosive random entry offset
   const randomX = (Math.random() - 0.5) * 300;
   const randomY = -150 - Math.random() * 150;
 
@@ -87,7 +86,8 @@ function InteractiveLetter({ letter, mode, mouse, containerRef }: {
         x: springX, 
         y: springY,
         display: "inline-block",
-        position: "relative"
+        position: "relative",
+        marginBottom: "10px"
       }}
       initial={{ opacity: 0, x: randomX, y: randomY }}
       animate={{ opacity: 1, x: 0, y: 0 }}
@@ -98,8 +98,9 @@ function InteractiveLetter({ letter, mode, mouse, containerRef }: {
         delay: Math.random() * 0.5 
       }}
     >
-      {/* Non-breaking space prevents standard layout collapsing */}
-      {letter === " " ? "\u00A0" : letter}
+      {letter === " " ? 
+          type === "h1" ? "\u00A0\u00A0" : "\u00A0\u00A0\u00A0"
+        : letter}
     </motion.span>
   );
 }
@@ -107,7 +108,6 @@ function InteractiveLetter({ letter, mode, mouse, containerRef }: {
 export default function HeroText({ mouse }: HeroTextProps) {
   const heroTextRef = useRef<HTMLDivElement | null>(null);
 
-  // Helper function to group items into rows based on the newLine trigger
   const renderRows = () => {
     const rows: JSX.Element[][] = [[]];
     
@@ -118,12 +118,12 @@ export default function HeroText({ mouse }: HeroTextProps) {
           key={`${index}-${i}`}
           letter={letter}
           mode={textObj.mode}
+          type={textObj.type}
           mouse={mouse}
           containerRef={heroTextRef}
         />
       ));
 
-      // Wrap the characters in their semantic tag (h1, p)
       const element = (
         <Tag key={index} className="text-element">
           {letters}
@@ -132,7 +132,6 @@ export default function HeroText({ mouse }: HeroTextProps) {
 
       rows[rows.length - 1].push(element);
 
-      // If this object forces a new line, start a fresh row array
       if (textObj.newLine && index < textData.length - 1) {
         rows.push([]);
       }

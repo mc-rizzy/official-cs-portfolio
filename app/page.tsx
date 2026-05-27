@@ -28,30 +28,28 @@ export default function Home() {
   },[]);
 
   return (<>
-  {/* About me, basic info. Replace later */}
     <section className="hero">
       <FaceCard src="profile/faceCard.jpg"/>
       <HeroText mouse={mouse}/>
-
-      
     </section>
+
     <div className="scroll-indicator-container">
-    <span className="scroll-indicator-text">Scroll Down</span>
-      <svg 
-        className="scroll-indicator-svg"
-        viewBox="0 0 24 24" 
-        fill="none" 
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path 
-          d="M7 13L12 18L17 13M7 6L12 11L17 6" 
-          stroke="currentColor" 
-          strokeWidth="2" 
-          strokeLinecap="round" 
-          strokeLinejoin="round"
-        />
-      </svg>
-  </div>
+      <span className="scroll-indicator-text">Scroll Down</span>
+        <svg 
+          className="scroll-indicator-svg"
+          viewBox="0 0 24 24" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path 
+            d="M7 13L12 18L17 13M7 6L12 11L17 6" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
+        </svg>
+    </div>
 
     <section className="hero">Technologies</section>
     <section className="hero">My Specialty area</section>

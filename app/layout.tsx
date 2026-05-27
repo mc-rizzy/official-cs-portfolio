@@ -1,18 +1,19 @@
 import { Plus_Jakarta_Sans, Space_Grotesk } from 'next/font/google';
-import './globals.css'; // or your global styles path
+import ScrollProvider from '@/scrollProvider';
+import './globals.css';
 
 // Configure the premium fonts
 const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['300', '400', '600'],
-  variable: '--font-jakarta', // Expose as CSS variable
+  variable: '--font-jakarta',
   display: 'swap',
 });
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-space', // Expose as CSS variable
+  variable: '--font-space',
   display: 'swap',
 });
 
@@ -23,7 +24,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${jakarta.variable} ${spaceGrotesk.variable}`}>
-      <body>{children}</body>
+      <body>
+        <ScrollProvider>
+          {children}
+        </ScrollProvider>
+      </body>
     </html>
   );
 }

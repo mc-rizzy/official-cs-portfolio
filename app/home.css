@@ -5,7 +5,6 @@
   --color-accent: #decbb7; /* Integrated your custom gold/cream color */
 }
 
-/* Global / Body Reset */
 body {
   background-color: var(--color-bg);
   color: var(--color-text-main);
@@ -15,14 +14,12 @@ body {
   padding: 0;
 }
 
-/* Base Headings Setup */
 h1 {
   font-size: clamp(2.5rem, 6vw, 5rem);
   font-weight: 700;
   margin: 0;
 }
 
-/* Main Layout Grid Wrap */
 .hero {
   position: relative;
   margin-top: 50vh;
@@ -38,7 +35,6 @@ h1 {
   align-self: center;
 }
 
-/* Flexbox Interactive Typography Container */
 .hero-container {
   position: relative;
   display: flex;
@@ -49,16 +45,14 @@ h1 {
   user-select: none;
 }
 
-/* Individual Layout Rows */
 .hero-row {
-  display: flex;
+  /* display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: wrap; */
   justify-content: center;
   width: 100%;
 }
 
-/* Semantic Elements (h1, p) Inside Rows */
 .text-element {
   display: inline-flex;
   margin: 0;
@@ -66,7 +60,6 @@ h1 {
   white-space: pre-wrap;
 }
 
-/* Individual Animated Characters */
 .letter-span {
   display: inline-block;
   position: relative;
@@ -79,7 +72,6 @@ h1 {
   transform: scale(1.2);
 }
 
-/* Premium Typography Style Modifiers */
 .hero-greeting {
   font-family: var(--font-jakarta), sans-serif;
   font-weight: 300;
@@ -130,8 +122,6 @@ h1 {
   color: var(--color-accent);
   text-shadow: 0 0 40px rgba(222, 203, 183, 0.2);
 }
-
-
 
 .scroll-indicator-container {
   position: absolute;
