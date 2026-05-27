@@ -1,198 +1,153 @@
-"use client";   
-import { JSX, useCallback, useEffect, useRef, useState } from "react";
+"use client";
+import { JSX, useEffect, useRef } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import "../home.css";
 
+interface HeroTextProps {
+  mouse: React.MutableRefObject<{ x: number; y: number }>;
+}
 
-export default function HeroText( {mouse}: {mouse: React.MutableRefObject<{x: number, y: number}>} ) {
+const textData = [
+  { content: "Hi, I'm ", type: "h1" as const, className: "hero-greeting", newLine: false },
+  { content: "Cracked", type: "h1" as const, mode: "highlight", className: "hero-name", newLine: true },
+  { content: "Haha lol, no actually my name is Caleb.", type: "p" as const, newLine: true },
+  { content: "I'm a programmer", type: "p" as const, className: "hero-subheading", newLine: true },
+  { content: "with a specialty in AI and Robotics.", type: "p" as const, className: "hero-subheading", newLine: true },
+  { content: "Scroll down for more info! :D", type: "p" as const, className: "hero-scroller", newLine: true },
+];
 
-    const heroTextRef = useRef<HTMLDivElement | null>(null);
-    const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
-    const particleRefs = useRef<(Particle)[]>([]);
-    const [windowSize, setWindowSize] = useState<{width: number, height: number}>({ width: 0, height: 0 });
-    const initialized = useRef(false);
-	const [moveLetters, setMoveLetters] = useState(false);
-    letterRefs.current = [];
+function InteractiveLetter({ letter, mode, mouse, containerRef }: { 
+  letter: string; 
+  mode?: string; 
+  mouse: React.MutableRefObject<{ x: number; y: number }>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const letterRef = useRef<HTMLSpanElement>(null);
+  
+  const animX = useMotionValue(0);
+  const animY = useMotionValue(0);
 
-    const textData = [
-        {content: "Hi, I'm ", type: "h1", newLine: false},
-        {content: "Cracked", type: "h1", mode: "highlight",  newLine: true},
-        {content: "Haha lol, no actually my name is Caleb.", type: "p",  newLine: true},
-        {content: "I'm a programmer", type: "p",  newLine: true},
-		{content: "with a specialty in AI and Robotics.", type: "p",  newLine: true},
-        {content: "Scroll down for more info! :D", type: "p",  newLine: true},
-    ];
+  const springConfig = { damping: 12, stiffness: 130, mass: 0.3 };
+  const springX = useSpring(animX, springConfig);
+  const springY = useSpring(animY, springConfig);
 
-    class Particle {
-        x: number;
-        y: number;
-        xv: number;
-        yv: number;
-        targetX: number;
-        targetY: number;
-        element: HTMLSpanElement;
-        
-        constructor(element: HTMLSpanElement) {
-            this.x = 0;
-            this.y = 0;
-            this.xv = 0;
-            this.yv = 0;
-            this.targetX = 0;
-            this.targetY = 0;
-            this.element = element;
-        }
+  useEffect(() => {
+    let animationFrameId: number;
 
-		physics(mouse: {x: number, y: number}) { 
-			let dx = this.targetX - this.x;
-			let dy = this.targetY - this.y;
-			let move = 0.05; // Slightly faster for better responsiveness
-			
-			let moveX = dx * move;
-			let moveY = dy * move;
+    const updatePhysics = () => {
+      if (!letterRef.current || !containerRef.current) {
+        animationFrameId = requestAnimationFrame(updatePhysics);
+        return;
+      }
 
-			let mouseRepelX = 0;
-			let mouseRepelY = 0;
-			
-			let mdx = this.x - mouse.x;
-			let mdy = this.y - mouse.y;
-			let mDistance = Math.sqrt(mdx * mdx + mdy * mdy);
-			
-			const mouseRadius = 100;
-			const mouseForce = 5;
+      const rect = letterRef.current.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
 
-			if (mDistance < mouseRadius) {
-				let force = (mouseRadius - mDistance) / mouseRadius;
-				mouseRepelX = (mdx / mDistance) * force * mouseForce;
-				mouseRepelY = (mdy / mDistance) * force * mouseForce;
-			}
+      // letter center relative to viewport
+      const letterCenterX = rect.left + rect.width / 2;
+      const letterCenterY = rect.top + rect.height / 2;
 
-			this.x += moveX + mouseRepelX;
-			this.y += moveY + mouseRepelY;
+      // mouse coordinates adjusted to viewport
+      const currentMouseX = mouse.current.x;
+      const currentMouseY = mouse.current.y;
 
-			if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1 && mDistance > mouseRadius) {
-				this.x = this.targetX;
-				this.y = this.targetY;
-			}
-		}
-        update(){
-            if(!this.element) return;
-            this.element.setAttribute('style', `left: ${this.x}px; top: ${this.y}px; transition: transform 0.15s ease-out;`);
-        }
-    }
+      const dx = letterCenterX - currentMouseX;
+      const dy = letterCenterY - currentMouseY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
-    useEffect(() => {
-		if(!initialized.current || !moveLetters) return;
-        let letterX = windowSize.width/2;
-        // let letterY = heroTextRef.current?.getBoundingClientRect().top || 0;
-		let letterY = windowSize.width*0.33;
-        letterY/=2;
+      const mouseRadius = 80;
+      const mouseForce = 40; 
 
-		let counter = 0;
-		if(particleRefs.current.length === 0) return;
-        textData.forEach((textObj) => {
-            let lineHeight = 0;
-			Array.from(textObj.content).forEach((letter, i) => {
-				let particle = (particleRefs.current[counter]) as Particle;
-				particle.x = parseFloat(particle.element.style.left);
-				particle.y = parseFloat(particle.element.style.top);
-				particle.targetX = letterX;
-                particle.targetY = letterY;
+      if (distance < mouseRadius && distance > 0) {
+        const force = (mouseRadius - distance) / mouseRadius;
+        // Pushes letters away from mouse position
+        animX.set((dx / distance) * force * mouseForce);
+        animY.set((dy / distance) * force * mouseForce);
+      } else {
+        animX.set(0);
+        animY.set(0);
+      }
 
-                letterX+=(particle.element?.offsetWidth+5) || 0;
-                let letterHeight = particle.element?.offsetHeight || 0;
-                if(letterHeight > lineHeight)
-                    lineHeight = letterHeight;
-				counter++;
-			});
-            
-            if(textObj.newLine){
-                letterY += lineHeight;
-                letterX = windowSize.width/2;
-            }
-        });
-        
-        let animationFrame: number;
-		const frame = () => {
-			particleRefs.current.forEach((particle) => {
-				particle.physics({ x: mouse.current.x, y: mouse.current.y-(heroTextRef.current?.getBoundingClientRect().top || 0) });
-				particle.update();
-			});
-			animationFrame = requestAnimationFrame(frame);
-		};
-		animationFrame = requestAnimationFrame(frame);
+      animationFrameId = requestAnimationFrame(updatePhysics);
+    };
 
-		// const handleMouseMove = (event: any) => {
-		// 	if (!heroTextRef.current) return;
-		// 	const rect = heroTextRef.current.getBoundingClientRect();
+    animationFrameId = requestAnimationFrame(updatePhysics);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [mouse, containerRef, animX, animY]);
 
-		// 	mouse.current.x = event.clientX;
-		// 	mouse.current.y = event.clientY - rect.top;
-		// };
+  // Initial explosive random entry offset
+  const randomX = (Math.random() - 0.5) * 300;
+  const randomY = -150 - Math.random() * 150;
 
-		// window.addEventListener('mousemove', handleMouseMove);
+  return (
+    <motion.span
+      ref={letterRef}
+      className={`letter-span ${mode || ""}`}
+      style={{ 
+        x: springX, 
+        y: springY,
+        display: "inline-block",
+        position: "relative"
+      }}
+      initial={{ opacity: 0, x: randomX, y: randomY }}
+      animate={{ opacity: 1, x: 0, y: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 45,
+        damping: 12,
+        delay: Math.random() * 0.5 
+      }}
+    >
+      {/* Non-breaking space prevents standard layout collapsing */}
+      {letter === " " ? "\u00A0" : letter}
+    </motion.span>
+  );
+}
 
-		return () => {
-			cancelAnimationFrame(animationFrame);
-			// window.removeEventListener('mousemove', handleMouseMove);
-		};
-    },[initialized, moveLetters]);
+export default function HeroText({ mouse }: HeroTextProps) {
+  const heroTextRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-
-        const observer = new IntersectionObserver(
-			(entries) => {  
-				entries.forEach((entry) => {
-				if (entry.isIntersecting) {
-					entry.target.classList.add('fade-in-visible');
-					observer.unobserve(entry.target);
-				}
-				});
-			},
-			{ threshold: 0.2 }
-        );
-
-        const hiddenElements = document.querySelectorAll('.fade-in-hidden');
-        hiddenElements.forEach((el) => observer.observe(el));
-
-        return () => observer.disconnect();
-    }, []);
-
-    useEffect(() => {
-		if (initialized.current || letterRefs.current.length === 0) return;
-
-		particleRefs.current = letterRefs.current.map((el) => {
-			if (!el) return null;
-			return new Particle(el);
-		}).filter(Boolean) as Particle[];
-
-		initialized.current = true;
-    }, [windowSize]);
-
+  // Helper function to group items into rows based on the newLine trigger
+  const renderRows = () => {
+    const rows: JSX.Element[][] = [[]];
     
-    return (<>
-      	<div ref={heroTextRef} className="heroText">
-			{textData.map((textObj, p) => {
-				const Tag = textObj.type as keyof JSX.IntrinsicElements;
+    textData.forEach((textObj, index) => {
+      const Tag = textObj.type;
+      const letters = Array.from(textObj.content).map((letter, i) => (
+        <InteractiveLetter
+          key={`${index}-${i}`}
+          letter={letter}
+          mode={textObj.mode}
+          mouse={mouse}
+          containerRef={heroTextRef}
+        />
+      ));
 
-				return <Tag key={p}>{
-					Array.from(textObj.content).map((letter, i) => {
-						let x = (windowSize.width/2)+(Math.random()*(windowSize.width*0.9)/2);
-						let y = (windowSize.width*0.33);
+      // Wrap the characters in their semantic tag (h1, p)
+      const element = (
+        <Tag key={index} className="text-element">
+          {letters}
+        </Tag>
+      );
 
-						let letterElement = (
-							<span key={i} style={{ left: `${x}px`, top: `${y}px`}} className={`${textObj.mode} newLine fade-in-hidden`} 
-							ref={(el) => {if (el) letterRefs.current.push(el); }}
-								onTransitionEnd={(e) => {
-									e.currentTarget.classList.remove('fade-in-hidden');
-									e.currentTarget.classList.add('funLetter');
-									if(p == textData.length - 1 && i == textObj.content.length - 1)
-										setMoveLetters(true);
-							}}>{letter}</span>
-						);
+      rows[rows.length - 1].push(element);
 
-						return letterElement;
-					})}</Tag>
-			})}
-      	</div>
-  </>);
+      // If this object forces a new line, start a fresh row array
+      if (textObj.newLine && index < textData.length - 1) {
+        rows.push([]);
+      }
+    });
+
+    return rows.map((row, rIndex) => (
+      <div key={rIndex} className="hero-row">
+        {row}
+      </div>
+    ));
+  };
+
+  return (
+    <div ref={heroTextRef} className="hero-container">
+      {renderRows()}
+    </div>
+  );
 }

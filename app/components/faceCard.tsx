@@ -1,109 +1,156 @@
 "use client";
-import { forwardRef, MutableRefObject, useEffect, useRef, useState } from "react";
+import { forwardRef, useRef } from "react";
+import { motion, useMotionValue, useSpring, useTransform, animate } from "framer-motion";
 import spritePreloader from "./spritePreloader";
 import "./faceCard.css";
 
 interface FaceCardProps {
     src: string;
-    mouse: MutableRefObject<{ x: number; y: number }>; 
 }
 
-const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src, mouse }, ref) => {
-    const cardContentRef = useRef<HTMLDivElement | null>(null);
+const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src }, ref) => {
     const cardContainerRef = useRef<HTMLDivElement | null>(null);
-    const profileImgRef = useRef<HTMLImageElement | null>(null);
-    const fireMouse = useRef<HTMLDivElement | null>(null);
-
-    const [currentFrame, setCurrentFrame] = useState(0);
-    const animationIntervalRef = useRef(null) as any;
-    const fireMouseMoveIntervalRef = useRef(null) as any;
-    const fireMousePositionRef = useRef({ x: 0, y: 0 });
+    const cardContentRef = useRef<HTMLDivElement | null>(null);
+    const cursorRef = useRef<HTMLDivElement | null>(null);
     
+    const cursorX = useMotionValue(0);
+    const cursorY = useMotionValue(0);
+
+    const springConfig = { damping: 25, stiffness: 250, mass: 0.5 };
+    const cursorXSpring = useSpring(cursorX, springConfig);
+    const cursorYSpring = useSpring(cursorY, springConfig);
+
+    const rotateX = useMotionValue(0);
+    const rotateY = useMotionValue(0);
+
+    const cardRotateX = useTransform(rotateY, [-0.5, 0.5], [20, -20]); 
+    const cardRotateY = useTransform(rotateX, [-0.5, 0.5], [-20, 20]);
+    const profileX = useTransform(rotateX, [-0.5, 0.5], [15, -15]);
+    const profileY = useTransform(rotateY, [-0.5, 0.5], [15, -15]);
+
     const frames = spritePreloader('/cursor/fire.png', 32, 32, 6);
+    const spriteAnimationRef = useRef<any>(null);
 
-    const showCursor = () => {
-        if (!animationIntervalRef.current){
-            animationIntervalRef.current = setInterval(() => {
-                setCurrentFrame((prev) => (prev + 1) % frames.length);
-            }, 100);
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!cardContentRef.current || !cardContainerRef.current) return;
+
+        const rect = cardContentRef.current.getBoundingClientRect();
+        const containerRect = cardContainerRef.current.getBoundingClientRect();
+        
+        const width = rect.width;
+        const height = rect.height;
+        const mouseX = (e.clientX - rect.left) / width - 0.5;
+        const mouseY = (e.clientY - rect.top) / height - 0.5;
+
+        rotateX.set(mouseX);
+        rotateY.set(mouseY);
+
+        cursorX.set(e.clientX - containerRect.left);
+        cursorY.set(e.clientY - containerRect.top);
+
+        const targetElement = e.target as HTMLElement;
+        const isOverCard = cardContentRef.current.contains(targetElement);
+
+        if (isOverCard) {
+            if (cursorRef.current && parseFloat(cursorRef.current.style.opacity || "0") === 0) {
+                startCursorAnimation();
+            }
+        } else {
+            if (cursorRef.current && parseFloat(cursorRef.current.style.opacity || "1") === 1) {
+                stopCursorAnimation();
+            }
         }
-
-        let offsetY = cardContainerRef.current?.getBoundingClientRect().top || 0;
-        let lerpRate = 0.2;
-        fireMousePositionRef.current = { x: mouse.current.x, y: mouse.current.y - offsetY };
-
-        const updatePosition = () => {
-            if (!fireMouse.current) return;
-            let newX = fireMousePositionRef.current.x + (mouse.current.x - fireMousePositionRef.current.x) * lerpRate;
-            let newY = fireMousePositionRef.current.y + (mouse.current.y - fireMousePositionRef.current.y - offsetY) * lerpRate;
-
-            fireMouse.current.style.setProperty('left', `${newX}px`);
-            fireMouse.current.style.setProperty('top', `${newY}px`);
-
-            fireMousePositionRef.current = { x: newX, y: newY };
-            fireMouseMoveIntervalRef.current = requestAnimationFrame(updatePosition);
-        };
-
-        if (!fireMouseMoveIntervalRef.current)
-            fireMouseMoveIntervalRef.current = requestAnimationFrame(updatePosition);
     };
 
-    const hideCursor = () => {
-        clearInterval(animationIntervalRef.current);
-        cancelAnimationFrame(fireMouseMoveIntervalRef.current);
-        animationIntervalRef.current = null;
-        fireMouseMoveIntervalRef.current = null;
-        setCurrentFrame(0);
+    const startCursorAnimation = () => {
+        if (!cursorRef.current) return;
+        animate(cursorRef.current, { opacity: 1 }, { duration: 0.15 });
+
+        if (frames.length > 0 && !spriteAnimationRef.current) {
+            spriteAnimationRef.current = animate(
+                0, 
+                frames.length - 1, 
+                {
+                    repeat: Infinity,
+                    duration: 0.6, 
+                    ease: "linear",
+                    onUpdate: (latest) => {
+                        const currentFrameIndex = Math.floor(latest);
+                        if (cursorRef.current) {
+                            cursorRef.current.style.backgroundImage = `url(${frames[currentFrameIndex]})`;
+                        }
+                    }
+                }
+            );
+        }
     };
 
-    useEffect(() => {
-        cardContainerRef.current?.addEventListener("mousemove", (e) => {
-            const card = cardContentRef.current;
-            const profileImg = profileImgRef.current;
-            if (!card || !profileImg) return;
+    const stopCursorAnimation = () => {
+        if (!cursorRef.current) return;
+        animate(cursorRef.current, { opacity: 0 }, { duration: 0.15 });
+        
+        if (spriteAnimationRef.current) {
+            spriteAnimationRef.current.stop();
+            spriteAnimationRef.current = null;
+        }
+    };
 
-            const rect = card.getBoundingClientRect();
-            
-            const x = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2);
-            const y = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2);
+    const handleMouseLeave = () => {
+        rotateX.set(0);
+        rotateY.set(0);
+        stopCursorAnimation();
+    };
 
-            const rotateX = x * 20; 
-            const rotateY = y * 20;
+    return (
+        <div 
+            ref={(node) => {
+                if (typeof ref === "function") ref(node);
+                else if (ref) ref.current = node;
+                cardContainerRef.current = node;
+            }} 
+            className="cardContainer fadeIn" 
+            style={{ position: 'relative', overflow: 'hidden' }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+        >
+            <motion.div 
+                ref={cardContentRef} 
+                className="cardContent" 
+                style={{
+                    transform: "perspective(1300px)",
+                    rotateX: cardRotateX,
+                    rotateY: cardRotateY,
+                    transformStyle: "preserve-3d"
+                }}
+            >
+                <motion.img 
+                    className="profileImg" 
+                    src={src} 
+                    alt="Team Member" 
+                    style={{
+                        scale: 1.1,
+                        x: profileX,
+                        y: profileY
+                    }}
+                />
+            </motion.div>
 
-            card.style.transform = `perspective(1300px) rotateY(${rotateX}deg) rotateX(${-rotateY}deg)`;
-
-            const moveX = x * -15; 
-            const moveY = y * -15;
-            profileImg.style.transform = `scale(1.1) translateX(${moveX}px) translateY(${moveY}px)`;
-            
-        });
-
-        cardContainerRef.current?.addEventListener("mouseleave", () => {
-            const card = cardContentRef.current;
-            const img = profileImgRef.current;
-            if (card)
-                card.style.transform = `perspective(1300px) rotateY(0deg) rotateX(0deg)`;
-            if (img)
-                img.style.transform = `scale(1.1) translateX(0px) translateY(0px)`;
-        });
-    }, [cardContentRef, cardContainerRef, profileImgRef]);
-
-    return (<>
-        <div ref={cardContainerRef} className="cardContainer fadeIn" onMouseEnter={showCursor} onMouseLeave={hideCursor}>
-            <div ref={cardContentRef} className="cardContent" 
-            onMouseEnter={()=>{fireMouse.current?.style.setProperty('opacity', '1');}}
-            onMouseLeave={()=>{fireMouse.current?.style.setProperty('opacity', '0')}} >
-                <img ref={profileImgRef} className="profileImg" src={src} alt="Team Member" />
-            </div>
-        </div>
-        {frames[currentFrame] && (
-            <div 
-                ref={fireMouse} 
+            <motion.div 
+                ref={cursorRef}
                 className="fireMouse pixelPerfect" 
-                style={{ backgroundImage: `url(${frames[currentFrame]})` }}
+                style={{
+                    position: 'absolute',
+                    pointerEvents: 'none', 
+                    left: cursorXSpring,
+                    top: cursorYSpring,
+                    opacity: 0,
+                    transform: 'translate(-50%, -50%)' 
+                }}
             />
-        )}
-    </>);
+        </div>
+    );
 });
+
+FaceCard.displayName = "FaceCard";
 
 export default FaceCard;
