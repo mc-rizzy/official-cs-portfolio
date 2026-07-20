@@ -6,6 +6,8 @@ import FaceCard from "./components/faceCard";
 import CoverBackground from "./components/coverBackground";
 // import HeroText from "./components/heroText";
 import "./home.css";
+import TechStack from "./components/techStack";
+import ContactForm from "./components/contactForm";
 
 const HeroText = dynamic(() => import('./components/heroText'), {
   ssr: false,
@@ -53,11 +55,13 @@ export default function Home() {
         </svg>
     </div>
 
-    <section className="hero">Technologies</section>
+    {/* <section className="hero">Technologies</section> */}
+    <TechStack/>
     <section className="hero">My Specialty area</section>
     <section className="hero">Example Projects + link to more</section>
     <section className="hero">brief work experience</section>
     <section className="hero">Contact me + my resume</section>
+    <ContactForm/>
   </>);
 }
 

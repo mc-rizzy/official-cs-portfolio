@@ -14,7 +14,7 @@ const textData = [
   { content: "Bridging raw data infrastructure to executive strategy", type: "p" as const, className: "hero-subheading", newLine: true },
   { content: "Clean automated production-grade data pipelines", type: "p" as const, className: "hero-subheading", newLine: true },
   { content: "Messy corporate datasets -> optimize metrics and revenue", type: "p" as const, className: "hero-scroller", newLine: true },
-  { content: "Open to internships", type: "p" as const, className: "hero-scroller", newLine: true },
+  { content: "Open to 2027 internships", type: "p" as const, className: "hero-scroller", newLine: true },
 ];
 
 function InteractiveLetter({ letter, type, mode, mouse, containerRef }: { 

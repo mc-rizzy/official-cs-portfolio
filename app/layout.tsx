@@ -17,6 +17,13 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap',
 });
 
+export const metadata = {
+  title: {
+    default: 'Caleb Liu',
+    template: '%s | Caleb Liu', // %s will be replaced by the page title
+  },
+}
+
 export default function RootLayout({
   children,
 }: {
