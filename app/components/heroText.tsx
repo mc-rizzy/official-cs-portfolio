@@ -10,11 +10,11 @@ interface HeroTextProps {
 const textData = [
   { content: "Hi, I'm ", type: "h1" as const, className: "hero-greeting", newLine: false },
   { content: "Caleb", type: "h1" as const, mode: "highlight", className: "hero-name", newLine: true },
-  { content: "Dual Computer Science x Business Analytics major", type: "p" as const, newLine: true },
+  { content: "Computer Science    Business Analytics    Finance", type: "p" as const, newLine: true },
   { content: "Bridging raw data infrastructure to executive strategy", type: "p" as const, className: "hero-subheading", newLine: true },
   { content: "Clean automated production-grade data pipelines", type: "p" as const, className: "hero-subheading", newLine: true },
   { content: "Messy corporate datasets -> optimize metrics and revenue", type: "p" as const, className: "hero-scroller", newLine: true },
-  { content: "Seeking Analytics Engineering role", type: "p" as const, className: "hero-scroller", newLine: true },
+  { content: "Open to internships", type: "p" as const, className: "hero-scroller", newLine: true },
 ];
 
 function InteractiveLetter({ letter, type, mode, mouse, containerRef }: { 

@@ -3,6 +3,7 @@ import { use, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import dynamic from 'next/dynamic';
 import FaceCard from "./components/faceCard";
+import CoverBackground from "./components/coverBackground";
 // import HeroText from "./components/heroText";
 import "./home.css";
 
@@ -28,6 +29,7 @@ export default function Home() {
   },[]);
 
   return (<>
+    <CoverBackground mouse={mouse}/>
     <section className="hero">
       <FaceCard src="profile/faceCard.jpg"/>
       <HeroText mouse={mouse}/>
