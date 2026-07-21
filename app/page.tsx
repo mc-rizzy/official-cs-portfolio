@@ -58,11 +58,10 @@ export default function Home() {
 
     {/* <section className="hero">Technologies</section> */}
     <TechStack/>
-    <section className="hero">My Specialty area</section>
-    <section className="hero">Example Projects + link to more</section>
+    {/* <section className="hero">My Specialty area</section>
+    <section className="hero">Featured Projects</section> */}
     <ProjectsGrid/>
-    <section className="hero">brief work experience</section>
-    <section className="hero">Contact me + my resume</section>
+    {/* <section className="hero">brief work experience</section> */}
     <ContactForm/>
   </>);
 }
