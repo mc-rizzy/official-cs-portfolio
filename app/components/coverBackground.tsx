@@ -10,6 +10,8 @@ interface MouseProps {
 
 export default function CoverBackground({ mouse }: MouseProps) {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
+  const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
+  const [isMaskLoaded, setIsMaskLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,11 +70,19 @@ export default function CoverBackground({ mouse }: MouseProps) {
         fill
         priority
         unoptimized
-        className="blur-[10px] scale-105"
-        style={{
-          objectFit: 'cover',
-          objectPosition: 'center',
-        }}
+        onLoad={() => setIsBackgroundLoaded(true)}
+        className={`
+          object-cover object-center
+          transition-opacity duration-1000 ease-in-out
+          ${isBackgroundLoaded ? "opacity-100 blur-[10px] scale-105" : "opacity-0"}
+        `}
+        
+        // className="blur-[10px] scale-105"
+        // style={{
+        //   objectFit: 'cover',
+        //   objectPosition: 'center',
+        //   opacity: 0
+        // }}
       />
 
       <div className="absolute inset-0 z-0" style={dynamicMaskStyles}>
@@ -82,11 +92,15 @@ export default function CoverBackground({ mouse }: MouseProps) {
           fill
           priority
           unoptimized
-          className="blur-[0px] scale-105"
-          style={{
-            objectFit: 'cover',
-            objectPosition: 'center',
-          }}
+          onLoad={() => setIsMaskLoaded(true)}
+          className={`
+            object-cover object-center scale-105
+            transition-all duration-2000 linear
+            ${isMaskLoaded && isBackgroundLoaded 
+              ? "opacity-100 blur-0" 
+              : "opacity-0 blur-md"
+            }
+          `}
         />
       </div>
 

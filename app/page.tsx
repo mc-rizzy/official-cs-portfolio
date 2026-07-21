@@ -8,6 +8,7 @@ import CoverBackground from "./components/coverBackground";
 import "./home.css";
 import TechStack from "./components/techStack";
 import ContactForm from "./components/contactForm";
+import ProjectsGrid from "./components/projectGrid";
 
 const HeroText = dynamic(() => import('./components/heroText'), {
   ssr: false,
@@ -59,6 +60,7 @@ export default function Home() {
     <TechStack/>
     <section className="hero">My Specialty area</section>
     <section className="hero">Example Projects + link to more</section>
+    <ProjectsGrid/>
     <section className="hero">brief work experience</section>
     <section className="hero">Contact me + my resume</section>
     <ContactForm/>
