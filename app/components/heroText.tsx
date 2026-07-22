@@ -1,7 +1,8 @@
 "use client";
-import { JSX, useEffect, useRef } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import "../home.css";
+import React from "react";
 
 interface HeroTextProps {
   mouse: React.MutableRefObject<{ x: number; y: number }>;
@@ -18,7 +19,7 @@ const textData = [
   { content: "Open to 2027 internships", type: "p" as const, className: "hero-scroller", newLine: true },
 ];
 
-function InteractiveLetter({ letter, type, mode, mouse, containerRef, simulate }: { 
+export const InteractiveLetter = React.memo(function({ letter, type, mode, mouse, containerRef, simulate }: { 
   letter: string; 
   mode?: string; 
   type?: string;
@@ -105,27 +106,61 @@ function InteractiveLetter({ letter, type, mode, mouse, containerRef, simulate }
         : letter}
     </motion.span>
   );
-}
+});
 
 export default function HeroText({ mouse, simulate }: HeroTextProps) {
   const heroTextRef = useRef<HTMLDivElement | null>(null);
+  const [visibleCount, setVisibleCount] = useState(0);
+
+  const totalLetters = textData.reduce(
+    (acc, obj) => acc + obj.content.length,
+    0
+  );
+
+  useEffect(() => {
+    if (visibleCount < totalLetters) {
+      // Chunk size: reveal 5-10 letters per frame
+      const frame = requestAnimationFrame(() => {
+        setVisibleCount((prev) => Math.min(prev + 5, totalLetters));
+      });
+
+      return () => cancelAnimationFrame(frame);
+    }
+  }, [visibleCount, totalLetters]);
 
   const renderRows = () => {
     const rows: JSX.Element[][] = [[]];
+    let globalIndex = 0;
     
     textData.forEach((textObj, index) => {
       const Tag = textObj.type;
-      const letters = Array.from(textObj.content).map((letter, i) => (
-        <InteractiveLetter
-          key={`${index}-${i}`}
-          letter={letter}
-          mode={textObj.mode}
-          type={textObj.type}
-          mouse={mouse}
-          containerRef={heroTextRef}
-          simulate={simulate}
-        />
-      ));
+      const letters = Array.from(textObj.content).map((letter, i) => {
+        const currentLetterIdx = globalIndex++;
+        const isVisible = currentLetterIdx < visibleCount;
+
+        if (!isVisible) {
+          return (
+            <span
+              key={`${index}-${i}`}
+              className="inline-block opacity-0 min-w-[0.2em]"
+            >
+              {letter}
+            </span>
+          );
+        }
+
+        return(
+          <InteractiveLetter
+            key={`${index}-${i}`}
+            letter={letter}
+            mode={textObj.mode}
+            type={textObj.type}
+            mouse={mouse}
+            containerRef={heroTextRef}
+            simulate={simulate}
+          />
+        )
+      });
 
       const element = (
         <Tag key={index} className="text-element">
