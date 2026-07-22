@@ -5,6 +5,7 @@ import "../home.css";
 
 interface HeroTextProps {
   mouse: React.MutableRefObject<{ x: number; y: number }>;
+  simulate: React.MutableRefObject<boolean>;
 }
 
 const textData = [
@@ -17,12 +18,13 @@ const textData = [
   { content: "Open to 2027 internships", type: "p" as const, className: "hero-scroller", newLine: true },
 ];
 
-function InteractiveLetter({ letter, type, mode, mouse, containerRef }: { 
+function InteractiveLetter({ letter, type, mode, mouse, containerRef, simulate }: { 
   letter: string; 
   mode?: string; 
   type?: string;
   mouse: React.MutableRefObject<{ x: number; y: number }>;
   containerRef: React.RefObject<HTMLDivElement | null>;
+  simulate: React.MutableRefObject<boolean>;
 }) {
   const letterRef = useRef<HTMLSpanElement>(null);
   
@@ -37,7 +39,7 @@ function InteractiveLetter({ letter, type, mode, mouse, containerRef }: {
     let animationFrameId: number;
 
     const updatePhysics = () => {
-      if (!letterRef.current || !containerRef.current) {
+      if (!letterRef.current || !containerRef.current || !simulate.current) {
         animationFrameId = requestAnimationFrame(updatePhysics);
         return;
       }
@@ -105,7 +107,7 @@ function InteractiveLetter({ letter, type, mode, mouse, containerRef }: {
   );
 }
 
-export default function HeroText({ mouse }: HeroTextProps) {
+export default function HeroText({ mouse, simulate }: HeroTextProps) {
   const heroTextRef = useRef<HTMLDivElement | null>(null);
 
   const renderRows = () => {
@@ -121,6 +123,7 @@ export default function HeroText({ mouse }: HeroTextProps) {
           type={textObj.type}
           mouse={mouse}
           containerRef={heroTextRef}
+          simulate={simulate}
         />
       ));
 

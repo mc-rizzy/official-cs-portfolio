@@ -8,7 +8,7 @@ export default function Cursor() {
   const [hovering, setHovering] = useState(false);
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  const springConfig = { damping: 40, stiffness: 600, mass: 0.15 };
+  const springConfig = { damping: 40, stiffness: 600, mass: 0.3 };
   const springX = useSpring(cursorX, springConfig);
   const springY = useSpring(cursorY, springConfig);
 

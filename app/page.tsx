@@ -24,6 +24,9 @@ export default function Home() {
     <CursorWrapper />
     <HeroSection/>
 
+    {/* Note: section3 is featured projects */}
+    {/* Note: section1 is work experience */}
+    
     {/* <section className="hero">Technologies</section> */}
     <TechStack/>
     {/* <section className="hero">My Specialty area</section>

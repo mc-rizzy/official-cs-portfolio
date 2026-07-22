@@ -6,9 +6,10 @@ import "./faceCard.css";
 
 interface FaceCardProps {
     src: string;
+    simulate: React.MutableRefObject<boolean>;
 }
 
-const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src }, ref) => {
+const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src, simulate }, ref) => {
     const cardContainerRef = useRef<HTMLDivElement | null>(null);
     const cardContentRef = useRef<HTMLDivElement | null>(null);
     const cursorRef = useRef<HTMLDivElement | null>(null);
@@ -32,7 +33,7 @@ const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src }, ref) => {
     const spriteAnimationRef = useRef<any>(null);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!cardContentRef.current || !cardContainerRef.current) return;
+        if (!cardContentRef.current || !cardContainerRef.current || !simulate.current) return;
 
         const rect = cardContentRef.current.getBoundingClientRect();
         const containerRect = cardContainerRef.current.getBoundingClientRect();

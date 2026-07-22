@@ -42,7 +42,7 @@ export default function ContactForm() {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="w-full max-w-5xl mx-auto px-4 py-16 dark:bg-zinc-950 rounded-2xl">
+      <div id="section5" className="w-full max-w-5xl mx-auto px-4 py-16 dark:bg-zinc-950 rounded-2xl">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12 items-start">
           
           {/* Left Column: Direct Info */}

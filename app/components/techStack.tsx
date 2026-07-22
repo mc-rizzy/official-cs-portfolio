@@ -46,7 +46,7 @@ const itemVariants = {
 export default function TechStack() {
   return (
     <LazyMotion features={domAnimation}>
-      <div className="w-full max-w-5xl mx-auto px-4 py-12 dark:bg-zinc-950 rounded-2xl">
+      <div id="section2" className="w-full max-w-5xl mx-auto px-4 py-12 dark:bg-zinc-950 rounded-2xl">
         <div className="mb-8 text-center md:text-left">
           <h2 className="text-3xl font-bold tracking-tight text-zinc-100 sm:text-4xl">
             My Toolkit

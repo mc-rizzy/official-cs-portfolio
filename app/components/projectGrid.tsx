@@ -64,7 +64,7 @@ export default function ProjectsGrid() {
 
   return (
     <LazyMotion features={domAnimation}>
-      <div className="w-full max-w-5xl mx-auto px-4 py-16 dark:bg-zinc-950 rounded-2xl">
+      <div id="section4" className="w-full max-w-5xl mx-auto px-4 py-16 dark:bg-zinc-950 rounded-2xl">
         
         {/* Header Block */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">

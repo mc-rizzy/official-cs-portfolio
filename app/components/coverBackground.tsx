@@ -10,9 +10,10 @@ interface CoverBackgroundProps {
   mouse: React.MutableRefObject<{ x: number; y: number }>;
   xOffset: MotionValue<number>;
   yOffset: MotionValue<number>;
+  simulate: React.MutableRefObject<boolean>;
 }
 
-export default function CoverBackground({ mouse, xOffset, yOffset }: CoverBackgroundProps) {
+export default function CoverBackground({ mouse, xOffset, yOffset, simulate }: CoverBackgroundProps) {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
   const [isMaskLoaded, setIsMaskLoaded] = useState(false);
@@ -34,7 +35,7 @@ export default function CoverBackground({ mouse, xOffset, yOffset }: CoverBackgr
       const currentX = mouse.current.x;
       const currentY = mouse.current.y;
 
-      if (containerRef.current && (currentX !== lastX || currentY !== lastY)) {
+      if (simulate.current && containerRef.current && (currentX !== lastX || currentY !== lastY)) {
         const xPercent = (currentX / window.innerWidth) * 100;
         const yPercent = (currentY / window.innerHeight) * 100;
 
@@ -65,7 +66,7 @@ export default function CoverBackground({ mouse, xOffset, yOffset }: CoverBackgr
   return (
     <div
       ref={containerRef}
-      className={`absolute inset-0 -z-10 overflow select-none pointer-events-none transition-opacity duration-1000 ease-in-out ${
+      className={`absolute inset-0 -z-10 overflow-hidden select-none pointer-events-none transition-opacity duration-1000 ease-in-out ${
         isReady ? "opacity-100" : "opacity-0"
       }`}
       style={{ willChange: 'transform' }}
