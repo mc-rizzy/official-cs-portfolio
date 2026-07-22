@@ -2,10 +2,17 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { svg } from 'framer-motion/client';
-import { motion, MotionValue, useTransform } from 'framer-motion';
+import { motion, MotionValue } from 'framer-motion';
 
-export default function CoverBackground({ mouse, xOffset, yOffset }: {mouse: React.MutableRefObject<{ x: number; y: number }>, xOffset: MotionValue<number>, yOffset: MotionValue<number>}) {
+const MotionImage = motion.create(Image);
+
+interface CoverBackgroundProps {
+  mouse: React.MutableRefObject<{ x: number; y: number }>;
+  xOffset: MotionValue<number>;
+  yOffset: MotionValue<number>;
+}
+
+export default function CoverBackground({ mouse, xOffset, yOffset }: CoverBackgroundProps) {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
   const [isMaskLoaded, setIsMaskLoaded] = useState(false);
@@ -13,19 +20,23 @@ export default function CoverBackground({ mouse, xOffset, yOffset }: {mouse: Rea
 
   useEffect(() => {
     const cacheBuster = Math.random().toString().slice(2, 8);
-    const dynamicUrl = `https://picsum.photos/1920/1080?random=${cacheBuster}`;
-    setBgUrl(dynamicUrl);
+    setBgUrl(`https://picsum.photos/1920/1080?random=${cacheBuster}`);
   }, []);
 
   useEffect(() => {
     if (!bgUrl) return;
 
+    let lastX = -1;
+    let lastY = -1;
     let animationFrameId: number;
 
     const updateMouseVariables = () => {
-      if (containerRef.current) {
-        const xPercent = (mouse.current.x / window.innerWidth) * 100;
-        const yPercent = (mouse.current.y / window.innerHeight) * 100;
+      const currentX = mouse.current.x;
+      const currentY = mouse.current.y;
+
+      if (containerRef.current && (currentX !== lastX || currentY !== lastY)) {
+        const xPercent = (currentX / window.innerWidth) * 100;
+        const yPercent = (currentY / window.innerHeight) * 100;
 
         containerRef.current.style.setProperty('--mouse-x', `${xPercent}%`);
         containerRef.current.style.setProperty('--mouse-y', `${yPercent}%`);
@@ -35,19 +46,12 @@ export default function CoverBackground({ mouse, xOffset, yOffset }: {mouse: Rea
     };
 
     animationFrameId = requestAnimationFrame(updateMouseVariables);
-
     return () => cancelAnimationFrame(animationFrameId);
   }, [bgUrl, mouse]);
 
   if (!bgUrl) return null;
 
   const dynamicMaskStyles = {
-    // clipPath: `polygon(
-    //   calc(var(--mouse-x, 50%) - 20%) calc(var(--mouse-y, 50%) - 20%),
-    //   calc(var(--mouse-x, 50%) + 20%) calc(var(--mouse-y, 50%) - 20%),
-    //   calc(var(--mouse-x, 50%) + 20%) calc(var(--mouse-y, 50%) + 20%),
-    //   calc(var(--mouse-x, 50%) - 20%) calc(var(--mouse-y, 50%) + 20%)
-    // )`,
     clipPath: `polygon(
       calc(var(--mouse-x, 50%) + 5%  + ((var(--mouse-y, 0%) - 50%) / 3.5)) 0%,
       calc(var(--mouse-x, 50%) + 25% + ((var(--mouse-y, 0%) - 50%) / 3.5)) 0%,
@@ -56,45 +60,35 @@ export default function CoverBackground({ mouse, xOffset, yOffset }: {mouse: Rea
     )`,
   };
 
-  const MotionImage = motion.create(Image);
-  const MotionImageMask = motion.create(Image);
+  const isReady = isMaskLoaded && isBackgroundLoaded;
 
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 -z-10 overflow-hidden select-none pointer-events-none"
+      className={`absolute inset-0 -z-10 overflow select-none pointer-events-none transition-opacity duration-1000 ease-in-out ${
+        isReady ? "opacity-100" : "opacity-0"
+      }`}
+      style={{ willChange: 'transform' }}
     >
       <MotionImage
         src={bgUrl}
         alt="Dynamic Portfolio Background"
         fill
         priority
-        unoptimized
         onLoad={() => setIsBackgroundLoaded(true)}
-        className={`
-          object-cover object-center
-          transition-opacity duration-1000 ease-in-out
-          ${isBackgroundLoaded ? `opacity-100 blur-[10px] scale-${125}` : "opacity-0"}
-        `}
-        style={{x: xOffset, y: yOffset}}
+        className="object-cover object-center blur-[10px]"
+        style={{x: xOffset, y: yOffset, scale: 1.25}}
       />
 
-      <motion.div className="absolute inset-0 z-0" style={{...dynamicMaskStyles, x: xOffset, y: yOffset}}>
-        <MotionImageMask
+      <motion.div className="absolute inset-0 z-0" style={{...dynamicMaskStyles}}>
+        <MotionImage
           src={bgUrl}
           alt="Dynamic Portfolio Background Window"
           fill
           priority
-          unoptimized
           onLoad={() => setIsMaskLoaded(true)}
-          className={`
-            object-cover object-center scale-${125}
-            transition-all duration-2000 linear
-            ${isMaskLoaded && isBackgroundLoaded 
-              ? "opacity-100 blur-0" 
-              : "opacity-0 blur-md"
-            }
-          `}
+          className="object-cover object-center"
+          style={{x: xOffset, y: yOffset, scale: 1.25}}
         />
       </motion.div>
 
