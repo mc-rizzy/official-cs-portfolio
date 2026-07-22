@@ -85,7 +85,7 @@ export default function HeroSection() {
             <motion.a
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 0.3, y: 0 }}
-                whileHover={{ scale: 1.05, opacity: 1 }}
+                whileHover={{ scale: 1.05, opacity: 0.7 }}
                 whileTap={{ scale: 0.95 }}
                 onAnimationComplete={() => setAnimationsLoaded((prev) => prev+1)}
                 transition={
@@ -117,7 +117,7 @@ export default function HeroSection() {
                 href={link.href}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 0.3, y: 0 }}
-                whileHover={{ scale: 1.05, opacity: 1 }}
+                whileHover={{ scale: 1.05, opacity: 0.7 }}
                 whileTap={{ scale: 0.95 }}
                 onAnimationComplete={() => setAnimationsLoaded((prev) => prev+1)}
                 transition={
@@ -183,7 +183,7 @@ export default function HeroSection() {
                 <motion.a
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 0.3 }}
-                    whileHover={{ scale: 1.05, opacity: 1 }}
+                    whileHover={{ scale: 1.05, opacity: 0.7 }}
                     whileTap={{ scale: 0.95 }}
                     onAnimationComplete={() => setAnimationsLoaded((prev) => prev+1)}
                     transition={

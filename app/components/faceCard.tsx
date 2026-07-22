@@ -103,7 +103,7 @@ const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src, simulate }, r
     };
 
     return (
-        <div 
+        <div
             ref={(node) => {
                 if (typeof ref === "function") ref(node);
                 else if (ref) ref.current = node;
@@ -114,9 +114,10 @@ const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src, simulate }, r
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
-            <motion.div 
+            <motion.div
                 ref={cardContentRef} 
                 className="cardContent" 
+                data-nopointer
                 style={{
                     transform: "perspective(1300px)",
                     rotateX: cardRotateX,
@@ -124,7 +125,7 @@ const FaceCard = forwardRef<HTMLDivElement, FaceCardProps>(({ src, simulate }, r
                     transformStyle: "preserve-3d"
                 }}
             >
-                <motion.img 
+                <motion.img
                     className="profileImg" 
                     src={src} 
                     alt="Team Member" 

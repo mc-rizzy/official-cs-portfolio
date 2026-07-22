@@ -5,6 +5,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function Cursor() {
   const [visible, setVisible] = useState(false);
+  const [touchingInvisible, setTouchingInvisible] = useState(false);
   const [hovering, setHovering] = useState(false);
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
@@ -18,13 +19,16 @@ export default function Cursor() {
     const move = (e: MouseEvent) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
-      if (!visible) setVisible(true);
+      if (!visible && !touchingInvisible) setVisible(true);
     };
     const leave = () => setVisible(false);
     const enter = () => setVisible(true);
 
     const hoverStart = () => setHovering(true);
     const hoverEnd = () => setHovering(false);
+    
+    const hideStart = () => {setTouchingInvisible(true); setVisible(false);};
+    const hideEnd = () => {setTouchingInvisible(false); setVisible(true);};
 
     window.addEventListener("mousemove", move, { passive: true });
     window.addEventListener("mouseleave", leave);
@@ -34,6 +38,10 @@ export default function Cursor() {
       document.querySelectorAll("a, button, [data-hover]").forEach((el) => {
         el.addEventListener("mouseenter", hoverStart);
         el.addEventListener("mouseleave", hoverEnd);
+      });
+      document.querySelectorAll("[data-nopointer]").forEach((el) => {
+        el.addEventListener("mouseenter", hideStart);
+        el.addEventListener("mouseleave", hideEnd);
       });
     };
     wire();
