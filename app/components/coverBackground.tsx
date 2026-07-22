@@ -3,12 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { svg } from 'framer-motion/client';
+import { motion, MotionValue, useTransform } from 'framer-motion';
 
-interface MouseProps {
-  mouse: React.MutableRefObject<{ x: number; y: number }>;
-}
-
-export default function CoverBackground({ mouse }: MouseProps) {
+export default function CoverBackground({ mouse, xOffset, yOffset }: {mouse: React.MutableRefObject<{ x: number; y: number }>, xOffset: MotionValue<number>, yOffset: MotionValue<number>}) {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [isBackgroundLoaded, setIsBackgroundLoaded] = useState(false);
   const [isMaskLoaded, setIsMaskLoaded] = useState(false);
@@ -59,12 +56,15 @@ export default function CoverBackground({ mouse }: MouseProps) {
     )`,
   };
 
+  const MotionImage = motion.create(Image);
+  const MotionImageMask = motion.create(Image);
+
   return (
-    <div 
+    <div
       ref={containerRef}
       className="absolute inset-0 -z-10 overflow-hidden select-none pointer-events-none"
     >
-      <Image
+      <MotionImage
         src={bgUrl}
         alt="Dynamic Portfolio Background"
         fill
@@ -74,19 +74,13 @@ export default function CoverBackground({ mouse }: MouseProps) {
         className={`
           object-cover object-center
           transition-opacity duration-1000 ease-in-out
-          ${isBackgroundLoaded ? "opacity-100 blur-[10px] scale-105" : "opacity-0"}
+          ${isBackgroundLoaded ? `opacity-100 blur-[10px] scale-${125}` : "opacity-0"}
         `}
-        
-        // className="blur-[10px] scale-105"
-        // style={{
-        //   objectFit: 'cover',
-        //   objectPosition: 'center',
-        //   opacity: 0
-        // }}
+        style={{x: xOffset, y: yOffset}}
       />
 
-      <div className="absolute inset-0 z-0" style={dynamicMaskStyles}>
-        <Image
+      <motion.div className="absolute inset-0 z-0" style={{...dynamicMaskStyles, x: xOffset, y: yOffset}}>
+        <MotionImageMask
           src={bgUrl}
           alt="Dynamic Portfolio Background Window"
           fill
@@ -94,7 +88,7 @@ export default function CoverBackground({ mouse }: MouseProps) {
           unoptimized
           onLoad={() => setIsMaskLoaded(true)}
           className={`
-            object-cover object-center scale-105
+            object-cover object-center scale-${125}
             transition-all duration-2000 linear
             ${isMaskLoaded && isBackgroundLoaded 
               ? "opacity-100 blur-0" 
@@ -102,7 +96,7 @@ export default function CoverBackground({ mouse }: MouseProps) {
             }
           `}
         />
-      </div>
+      </motion.div>
 
       <div 
         className="absolute inset-0 z-20 border-2 border-white/40 pointer-events-none rounded-none shadow-[inset_0_0_20px_rgba(255,255,255,0.1)]" 

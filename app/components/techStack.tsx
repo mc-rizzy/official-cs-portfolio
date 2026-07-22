@@ -2,7 +2,7 @@
 
 import React from "react";
 import { LazyMotion, domAnimation, m } from "framer-motion";
-import { Database, Code } from "lucide-react";
+import { Database, Code, DatabaseX } from "lucide-react";
 
 interface TechItem {
   name: string;
@@ -27,6 +27,7 @@ const technologies: TechItem[] = [
   { name: "C#", category: "data-lang", iconUrl: "csharp", color: "hover:border-purple-500 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)]" },
   { name: "MongoDB", category: "backend", iconUrl: "mongodb", color: "hover:border-emerald-500 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)]" },
   { name: "SQL", category: "backend", FallbackIcon: Database, color: "hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.2)]" },
+  { name: "Three.js", category: "frontend", FallbackIcon: DatabaseX, color: "hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.2)]" },
 ];
 
 const containerVariants = {
@@ -61,6 +62,7 @@ export default function TechStack() {
           whileInView="show"
           viewport={{ once: true, margin: "-50px" }}
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+          data-hover
         >
           {technologies.map((tech) => {
             const Fallback = tech.FallbackIcon || Code;

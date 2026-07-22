@@ -2,7 +2,10 @@
   --color-bg: #0a0a0c;
   --color-text-main: #f4f4f6;
   --color-text-muted: #8e8e99;
+  
   --color-accent: #decbb7; /* Integrated your custom gold/cream color */
+  --color-accent-opacque: #decbb79f;
+  --color-accent-subtle: #decbb731;
 }
 
 body {

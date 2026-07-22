@@ -9,6 +9,8 @@ import "./home.css";
 import TechStack from "./components/techStack";
 import ContactForm from "./components/contactForm";
 import ProjectsGrid from "./components/projectGrid";
+import CursorWrapper from "./components/cursorWrapper";
+import HeroSection from "./components/heroSection";
 
 const HeroText = dynamic(() => import('./components/heroText'), {
   ssr: false,
@@ -16,45 +18,11 @@ const HeroText = dynamic(() => import('./components/heroText'), {
 
 export default function Home() {
 
-  const mouse = useRef({x: 0, y: 0});
-
-  useEffect(() => {
-    const handleMouseMove = (event: any) => {
-			mouse.current.x = event.clientX;
-			mouse.current.y = event.clientY;
-		};
-
-		window.addEventListener('mousemove', handleMouseMove);
-
-		return () => {
-			window.removeEventListener('mousemove', handleMouseMove);
-		};
-  },[]);
+  
 
   return (<>
-    <CoverBackground mouse={mouse}/>
-    <section className="hero">
-      <FaceCard src="profile/faceCard.jpg"/>
-      <HeroText mouse={mouse}/>
-    </section>
-
-    <div className="scroll-indicator-container">
-      <span className="scroll-indicator-text">Scroll Down</span>
-        <svg 
-          className="scroll-indicator-svg"
-          viewBox="0 0 24 24" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path 
-            d="M7 13L12 18L17 13M7 6L12 11L17 6" 
-            stroke="currentColor" 
-            strokeWidth="2" 
-            strokeLinecap="round" 
-            strokeLinejoin="round"
-          />
-        </svg>
-    </div>
+    <CursorWrapper />
+    <HeroSection/>
 
     {/* <section className="hero">Technologies</section> */}
     <TechStack/>
