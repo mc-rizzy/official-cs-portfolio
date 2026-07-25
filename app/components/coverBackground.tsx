@@ -36,8 +36,13 @@ export default function CoverBackground({ mouse, xOffset, yOffset, simulate }: C
       const currentY = mouse.current.y;
 
       if (simulate.current && containerRef.current && (currentX !== lastX || currentY !== lastY)) {
-        const xPercent = (currentX / window.innerWidth) * 100;
-        const yPercent = (currentY / window.innerHeight) * 100;
+        let previousX = parseFloat(containerRef.current.style.getPropertyValue('--mouse-x')) || 0;
+        let previousY = parseFloat(containerRef.current.style.getPropertyValue('--mouse-y')) || 0;
+        let xPercent = (currentX / window.innerWidth) * 100;
+        let yPercent = (currentY / window.innerHeight) * 100;
+
+        xPercent = previousX+(xPercent-previousX)*0.1;
+        yPercent = previousY+(yPercent-previousY)*0.1;
 
         containerRef.current.style.setProperty('--mouse-x', `${xPercent}%`);
         containerRef.current.style.setProperty('--mouse-y', `${yPercent}%`);
