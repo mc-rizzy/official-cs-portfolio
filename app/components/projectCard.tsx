@@ -7,7 +7,7 @@ import { ExternalLink, Terminal, Globe, Brain } from "lucide-react";
 export interface ProjectData {
   title: string;
   description: string;
-  category: "Web App" | "AI & Data" | "System / Engine";
+  category: "Web App" | "AI & Data" | "System / Engine" | "Blockchain";
   tags: string[];
   liveUrl?: string;
   githubUrl?: string;

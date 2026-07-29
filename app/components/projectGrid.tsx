@@ -7,6 +7,26 @@ import { ProjectCard, ProjectData } from "./projectCard";
 // Mock Projects Array configured to cleanly match your tech stack properties
 const initialProjects: ProjectData[] = [
   {
+    title: "Blockchain in Python and Flask",
+    description: "Functional Blockchain node written in Python with Flask REST API, SHA-256 Proof of Work, node consensus resolution, and test suits.",
+    category: "Blockchain",
+    tags: ["Python", "Flask", "REST API", "Cryptography"],
+    githubUrl: "https://github.com/mc-rizzy/python-blockchain",
+    featuredMetric: "< 10ms/Block"
+  },
+  {
+    title: "HackRPI Website",
+    description: "Functiona",
+    category: "Web App",
+    tags: ["Next.js", "Tailwind", "Three.js", "Node.js"],
+    githubUrl: "https://github.com/hack-rpi/HackRPI-Website-2026",
+    liveUrl: "https://hackrpi.com",
+    featuredMetric: "99.4% UPTIME"
+  },
+
+
+
+  {
     title: "AI Predictive Analytics Dashboard",
     description: "Highly interactive Next.js application displaying modular accuracy arrays, leveraging a backend processing stream built via PyTorch and custom Python architecture scripts.",
     category: "AI & Data",
