@@ -1,6 +1,7 @@
 import { Plus_Jakarta_Sans, Space_Grotesk } from 'next/font/google';
 import ScrollProvider from '@/scrollProvider';
 import './globals.css';
+import CursorWrapper from './components/cursorWrapper';
 
 // Configure the premium fonts
 const jakarta = Plus_Jakarta_Sans({
@@ -33,6 +34,7 @@ export default function RootLayout({
     <html lang="en" className={`${jakarta.variable} ${spaceGrotesk.variable}`}>
       <body>
         <ScrollProvider>
+          <CursorWrapper />
           {children}
         </ScrollProvider>
       </body>
