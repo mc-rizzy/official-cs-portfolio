@@ -21,6 +21,7 @@ export default function Home() {
   
 
   return (<>
+    <CursorWrapper />
     <HeroSection/>
 
     {/* Note: section3 is featured projects */}

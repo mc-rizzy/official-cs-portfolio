@@ -34,7 +34,6 @@ export default function RootLayout({
     <html lang="en" className={`${jakarta.variable} ${spaceGrotesk.variable}`}>
       <body>
         <ScrollProvider>
-          <CursorWrapper />
           {children}
         </ScrollProvider>
       </body>
