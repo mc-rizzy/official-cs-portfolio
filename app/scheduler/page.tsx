@@ -11,6 +11,7 @@ export default function Page() {
     const [selectedDay, setSelectedDay] = useState((new Date().getDay() + 6) % 7);
     const [blocks, setBlocks] = useState<any[]>([]);
     const [dayBounds, setDayBounds] = useState<{ [key: number]: { x: number; width: number } }>({});
+    const [updateBlockInterval, setUpdateBlockInterval] = useState<ReturnType<typeof setInterval> | null>(null);
     const days = useRef<any[]>([
         {i: 0, name: "Monday"}, 
         {i: 1, name: "Tuesday"}, 
@@ -67,8 +68,8 @@ export default function Page() {
             start: "",
             end: "",
             name: "Blank",
-            description: "",
-            color: ""
+            description: "Blank",
+            color: "",
         }
         setBlocks((prevBlocks) => [...prevBlocks, newBlock]);
     };
@@ -96,10 +97,14 @@ export default function Page() {
             blocks.map((data: any, idx: any)=>{
                 if (!daysContainerRef.current) return;
                 let verticalUnit = (daysContainerRef.current.clientHeight - 2*containerPadding) / 72;
+                const calculatedHeight = (data.start !== "" && data.end !== "")
+                    ? Math.max((data.end - data.start) * verticalUnit * 4, 15) // enforce min height
+                    : data.height * verticalUnit * 4;
+
                 return <Block
                     key={idx}
                     width={data.day && dayBounds[data.day]? dayBounds[data.day].width : data.width}
-                    height={data.height*verticalUnit*4}
+                    height={calculatedHeight}
                     x={data.day && dayBounds[data.day]? dayBounds[data.day].x : data.x}
                     y={data.start? ((data.start-6)*4*verticalUnit)+containerPadding : data.y}
                     start={data.start}
@@ -122,12 +127,28 @@ export default function Page() {
                                 ? {
                                     ...b,
                                     start: startTime,
+                                    end: startTime + data.height,
                                     x: Math.max(rulerLeftOffset, snapX),
                                     width: targetWidth,
                                     day: activeDay?.i,
                                     y: containerPadding + snappedStart * verticalUnit,
                                     }
                                 : b
+                            )
+                        );
+                    }}
+                    onResize={(mouseY) => {
+                        const snappedEnd = Math.round(Math.max(0, mouseY - containerPadding) / verticalUnit);
+                        const endTime = 6 + snappedEnd / 4;
+                        setBlocks((prev) =>
+                            prev.map((b, i) =>
+                                i === idx
+                                    ? {
+                                          ...b,
+                                          end: endTime,
+                                          height: endTime - data.start
+                                      }
+                                    : b
                             )
                         );
                     }}
@@ -170,21 +191,37 @@ export default function Page() {
     useLayoutEffect(() => {
         if (!daysContainerRef.current) return;
 
-        const newBounds: { [key: number]: { x: number; width: number } } = {};
+        const updateBounds = () => {
+            const newBounds: { [key: number]: { x: number; width: number } } = {};
 
-        days.current.forEach((day) => {
+            days.current.forEach((day) => {
             const el = daysContainerRef.current?.querySelector(
-            `[data-index="${day.i}"]`
+                `[data-index="${day.i}"]`
             ) as HTMLElement;
 
             if (el) {
-            const rect = el.getBoundingClientRect();
-            newBounds[day.i] = { x: rect.left, width: rect.width };
+                const rect = el.getBoundingClientRect();
+                newBounds[day.i] = { x: rect.left, width: rect.width };
             }
-        });
+            });
 
-        setDayBounds(newBounds);
-    }, [zoomData, selectedDay]);
+            setDayBounds(newBounds);
+        };
+
+        updateBounds();
+
+        const observer = new ResizeObserver(() => { updateBounds(); });
+
+        const columns = daysContainerRef.current.querySelectorAll('[data-index]');
+        columns.forEach((col) => observer.observe(col));
+
+        window.addEventListener('resize', updateBounds);
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('resize', updateBounds);
+        };
+    }, [selectedDay, zoomData.columnScale]); // Re-attach when column setup or scale changes
 
 
     useEffect(() => {

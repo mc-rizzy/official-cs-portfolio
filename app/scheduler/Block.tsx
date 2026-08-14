@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import "./block.css"
 
 export interface BlockProps {
@@ -16,6 +16,7 @@ export interface BlockProps {
 	color?: string;
 	style?: React.CSSProperties;
 	onDrag?: (newX: number, newY: number, mouseX: number, mouseY: number) => void;
+	onResize?: (mouseY: number) => void;
 	startDrag?: () => void;
 }
 
@@ -32,6 +33,7 @@ export const Block: React.FC<BlockProps> = ({
 	color = "rgba(0, 255, 0, 0.2)",
 	style,
 	onDrag,
+	onResize,
 	startDrag,
 }) => {
 	const sizeGradient = Math.max(Math.min(width * height / 73000, 1), 0);
@@ -55,9 +57,24 @@ export const Block: React.FC<BlockProps> = ({
 		window.addEventListener('mouseup', handleMouseUp);
 	};
 
+	const handleResizeStart = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevents triggering drag
+
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+            onResize?.(moveEvent.clientY);
+        };
+
+        const handleMouseUp = () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+    };
+
 	return (
 		<div
-			data-hover
 			onMouseDown={handleMouseDown}
 			className={`absolute z-2 text-slate-100 rounded p-2 overflow-hidden text-xs cursor-grab active:cursor-grabbing select-none ${className}`}
 			style={{
@@ -77,7 +94,11 @@ export const Block: React.FC<BlockProps> = ({
 				}} className="truncate">{name}</span>
 				<span style={{fontSize: `${20 * (0.3+0.7*sizeGradient)}px`}} className=" text-slate-400 ml-1">{start} - {end}</span>
 			</div>
-			<p className="text-slate-300 text-[11px] mt-1 line-clamp-2">{description}</p>
+			<p style={{
+				opacity: sizeGradient > 0.2? 0.7*sizeGradient : 0,
+				fontSize: `${15 * (0.5+0.5*sizeGradient)}px`
+			}} className="text-slate-300 mt-1 line-clamp-2">{description}</p>
+			<div onMouseDown={handleResizeStart} data-hover className="absolute bottom-0 left-0 h-[10%] w-full" />
 		</div>
 	);
 };
