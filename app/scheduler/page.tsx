@@ -1,14 +1,16 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import HeroSection from "../components/heroSection";
 import Blocks, { Block } from "./Block";
 import CursorWrapper from "../components/cursorWrapper";
+import next from "next";
 
 
 
 export default function Page() {
     const [selectedDay, setSelectedDay] = useState((new Date().getDay() + 6) % 7);
     const [blocks, setBlocks] = useState<any[]>([]);
+    const [dayBounds, setDayBounds] = useState<{ [key: number]: { x: number; width: number } }>({});
     const days = useRef<any[]>([
         {i: 0, name: "Monday"}, 
         {i: 1, name: "Tuesday"}, 
@@ -18,12 +20,32 @@ export default function Page() {
         {i: 5, name: "Saturday"}, 
         {i: 6, name: "Sunday"}, 
     ]);
-
+    const daysContainerRef = useRef<HTMLDivElement>(null);
+    const wheelTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    
     const containerPadding = 15;
     const columnWidth = 30;
     const columnGap = 10;
     const selectedDayWidth = 100;
     const rulerLeftOffset = 65;
+    const columnWidthTransition = 'width 0.2s ease'
+
+    const selectedColumnBackgroundColor = "rgba(255, 255, 255, 0.1)";
+    const columnBackgroundColor = "rgba(255, 255, 255, 0.05)";
+    const columnBorderColor = "rgba(255, 255, 255, 0)";
+    const timeColor = "rgba(255, 255, 255, 0.33)";
+    const rulerColor1 = "1px solid rgba(255, 255, 255, 0.15)";
+    const rulerColor2 = "1px dashed rgba(255, 255, 255, 0.1)";
+
+    const [zoomData, setZoomData] = useState({
+        minScale: 1,
+        maxScale: 5,
+
+        transitionWidth: columnWidthTransition,
+        columnScale: 1,
+        scale: 1,
+        gridHeight: `calc(${100}vh - ${2 * containerPadding}px)`,
+    });
 
     // Generate hour labels starting at 6 PM (18:00) through 18 hours (72 ticks / 4 ticks per hr)
     const startHour = 18; // 6 PM in 24h format
@@ -34,13 +56,12 @@ export default function Page() {
         return `${hour12} ${period}`;
     });
 
-    const gridHeight = `calc(100vh - ${2 * containerPadding}px)`;
-
     const handleContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
         let newBlock = {
             width: 100,
-            height: 100,
+            height: 1,
+            day: "",
             x: e.clientX,
             y: e.clientY,
             start: "",
@@ -52,73 +73,139 @@ export default function Page() {
         setBlocks((prevBlocks) => [...prevBlocks, newBlock]);
     };
 
-    return (<>
-        <CursorWrapper />
-        <div onContextMenu={handleContextMenu} style={{ cursor: "none", position: 'relative', width: '100vw', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', overflowX: 'hidden' }}>
-            {blocks.map((data: any, idx: any)=>{
+    const updateBlocks = () => {
+        if (daysContainerRef.current){
+            const updatedDays = days.current.map((day) => {
+                const el = daysContainerRef.current?.querySelector(
+                    `[data-index="${day.i}"]`
+                ) as HTMLElement;
+                if (!el) return day;
+
+                const rect = el.getBoundingClientRect();
+                return {
+                    ...day,
+                    x: rect.left,
+                    width: rect.width,
+                };
+            });
+
+            days.current = updatedDays;
+        }
+        
+        return(
+            blocks.map((data: any, idx: any)=>{
+                if (!daysContainerRef.current) return;
+                let verticalUnit = (daysContainerRef.current.clientHeight - 2*containerPadding) / 72;
                 return <Block
                     key={idx}
-                    width={data.width}
-                    height={data.height}
-                    x={data.x}
-                    y={data.y}
+                    width={data.day && dayBounds[data.day]? dayBounds[data.day].width : data.width}
+                    height={data.height*verticalUnit*4}
+                    x={data.day && dayBounds[data.day]? dayBounds[data.day].x : data.x}
+                    y={data.start? ((data.start-6)*4*verticalUnit)+containerPadding : data.y}
                     start={data.start}
                     end={data.end}
                     name={data.name}
                     description={data.description}
-                    onDrag={(newX, newY) => {
-                        let calcY = (window.innerHeight - 2*containerPadding) / 72;
+                    onDrag={(newX, newY, mouseX, mouseY) => {
                         const activeDay = days.current.find(
-                            (day) => newX >= day.x && newX < day.x + day.width
+                            (day) => mouseX >= day.x && mouseX < day.x + day.width
                         );
 
                         const snapX = activeDay ? activeDay.x : newX;
                         const targetWidth = activeDay ? activeDay.width : data.width;
+                        const snappedStart = Math.round(Math.max(0, newY - containerPadding) / verticalUnit);
+                        const startTime = 6 + snappedStart / 4;
 
                         setBlocks((prev) =>
                             prev.map((b, i) =>
                                 i === idx
                                 ? {
                                     ...b,
+                                    start: startTime,
                                     x: Math.max(rulerLeftOffset, snapX),
                                     width: targetWidth,
-                                    y:
-                                        containerPadding +
-                                        Math.round(Math.max(0, newY) / calcY) * calcY,
+                                    day: activeDay?.i,
+                                    y: containerPadding + snappedStart * verticalUnit,
                                     }
                                 : b
                             )
                         );
                     }}
-                    startDrag={() => {
-                        const container = document.getElementById("daysContainer");
-                        if (!container) return;
-
-                        const updatedDays = days.current.map((day) => {
-                        const el = container.querySelector(
-                            `[data-index="${day.i}"]`
-                        ) as HTMLElement;
-                        if (!el) return day;
-
-                        const rect = el.getBoundingClientRect();
-                        return {
-                            ...day,
-                            x: rect.left,
-                            width: rect.width,
-                        };
-                        });
-
-                        days.current = updatedDays;
-                    }}
+                    startDrag={() => {}}
                 />
-            })}
+            })
+        );
+    }
+
+    const handleWheel = (e: WheelEvent) => {
+        if (!e.ctrlKey) return;
+        e.preventDefault();
+        if (wheelTimeoutRef.current) {clearTimeout(wheelTimeoutRef.current);}
+
+        const zoomFactor = Math.exp(-e.deltaY * 0.01);
+        const widthZoomFactor = Math.exp(-e.deltaY * 0.02);
+
+        setZoomData((prev) => {
+            const nextScale = Math.min(
+                prev.maxScale,
+                Math.max(prev.minScale, prev.scale * zoomFactor)
+            );
+            const nextWidth = Math.min(
+                prev.maxScale,
+                Math.max(prev.minScale, prev.columnScale * widthZoomFactor)
+            );
+
+            return {
+                ...prev,
+                transitionWidth: "",
+                columnScale: nextWidth,
+                scale: nextScale,
+                gridHeight: `calc(${nextScale * 100}vh - ${2 * containerPadding}px)`
+            };
+        });
+        updateBlocks();
+        wheelTimeoutRef.current = setTimeout(() => {    updateBlocks();   }, 150);
+    };
+
+    useLayoutEffect(() => {
+        if (!daysContainerRef.current) return;
+
+        const newBounds: { [key: number]: { x: number; width: number } } = {};
+
+        days.current.forEach((day) => {
+            const el = daysContainerRef.current?.querySelector(
+            `[data-index="${day.i}"]`
+            ) as HTMLElement;
+
+            if (el) {
+            const rect = el.getBoundingClientRect();
+            newBounds[day.i] = { x: rect.left, width: rect.width };
+            }
+        });
+
+        setDayBounds(newBounds);
+    }, [zoomData, selectedDay]);
+
+
+    useEffect(() => {
+        window.addEventListener('wheel', handleWheel, { passive: false });
+        return () => {
+            window.removeEventListener('wheel', handleWheel);
+            if (wheelTimeoutRef.current) {  clearTimeout(wheelTimeoutRef.current);  }
+        };
+    }, []);
+
+    return (<>
+        <CursorWrapper />
+        <div onContextMenu={handleContextMenu} style={{ touchAction: "none", cursor: "none", position: 'relative', width: '100vw', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', overflowX: 'hidden' }}>
+            {updateBlocks()}
             <div
                 style={{
                 position: 'absolute',
                 top: `${containerPadding}px`,
                 left: 0,
                 right: 0,
-                height: gridHeight,
+                height: zoomData.gridHeight,
                 display: 'grid',
                 gridTemplateRows: 'repeat(72, 1fr)',
                 pointerEvents: 'none', // Allows clicking through to columns underneath
@@ -136,8 +223,8 @@ export default function Page() {
                             position: 'relative',
                             width: '100%',
                             borderTop: isHourTick
-                            ? '1px solid rgba(255, 255, 255, 0.4)'
-                            : '1px dashed rgba(255, 255, 255, 0.1)',
+                            ? rulerColor1
+                            : rulerColor2,
                             boxSizing: 'border-box',
                         }}
                     >
@@ -150,7 +237,7 @@ export default function Page() {
                             left: '8px',
                             fontSize: '10px',
                             fontWeight: 600,
-                            color: 'rgba(255, 255, 255, 0.7)',
+                            color: timeColor,
                             fontFamily: 'monospace',
                             backgroundColor: '#121212',
                             paddingRight: '4px',
@@ -175,25 +262,33 @@ export default function Page() {
                     position: 'relative',
                     zIndex: 1,
                 }}
-                id="daysContainer"
+                ref={daysContainerRef}
             >
                 {days.current.map((data, idx) => {
                     const isSelected = data.i === selectedDay;
-                    const currentWidth = isSelected ? selectedDayWidth : columnWidth;
+                    const currentWidth = (isSelected ? selectedDayWidth : columnWidth) * zoomData.columnScale;
 
                     return (
                         <div
                             key={idx}
                             data-index={idx}
-                            onClick={() => setSelectedDay(data.i)}
+                            onClick={() => {
+                                setSelectedDay(data.i);
+                                setZoomData((prev) => {
+                                    return {
+                                        ...prev,
+                                        transitionWidth: columnWidthTransition,
+                                    }
+                                })
+                            }}
                             style={{
                                 width: `${currentWidth}px`,
-                                height: gridHeight,
-                                backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-                                borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
-                                borderRight: '1px solid rgba(255, 255, 255, 0.2)',
+                                height: zoomData.gridHeight,
+                                backgroundColor: isSelected ? selectedColumnBackgroundColor : columnBackgroundColor,
+                                borderLeft: `1px solid ${columnBorderColor}`,
+                                borderRight: `1px solid ${columnBorderColor}`,
                                 boxSizing: 'border-box',
-                                transition: 'width 0.2s ease',
+                                transition: zoomData.transitionWidth,
                             }}
                         />
                     );
@@ -205,5 +300,8 @@ export default function Page() {
 
 
 // Scheduler
+// change block names, colors, zoom, save, polish
+
 // Budgeter
+
 // Resume
