@@ -361,6 +361,10 @@ export default function Page() {
         if (saved.length > 0)
             setBlocks(saved);
 
+        // clearing the saved cache
+        // localStorage.removeItem('canvas_blocks_data');
+        // setBlocks([]);
+
         return () => {
             window.removeEventListener('wheel', handleWheel);
         };
