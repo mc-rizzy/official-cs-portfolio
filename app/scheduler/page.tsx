@@ -426,7 +426,3 @@ export default function Page() {
         </div>
     </>);
 }
-
-// Budgeter
-
-// Resume
