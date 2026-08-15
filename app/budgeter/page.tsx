@@ -13,12 +13,10 @@ export default function Budgeter() {
     const { days, setDays, categoryExpenses, setCategoryExpenses, isLoaded } =
     useBudgetStorage();
 
-    //   const [days, setDays] = useState(generateInitialDays);
     const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
     const [targetCategory, setTargetCategory] = useState<string | null>(null);
     const [activeInput, setActiveInput] = useState<string>("");
     const [inputMode, setInputMode] = useState<"earn" | "deduct" | null>(null);
-    //   const [categoryExpenses, setCategoryExpenses] = useState<Record<string, number>>({});
 
     const totalEarnings = useMemo(() => {
         return days.reduce((acc: any, curr: { earnings: any; }) => acc + curr.earnings, 0);

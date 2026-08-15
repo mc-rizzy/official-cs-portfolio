@@ -1,3 +1,5 @@
+import "./budget.css"
+
 interface Props {
   inputMode: "earn" | "deduct" | null;
   activeInput: string;
