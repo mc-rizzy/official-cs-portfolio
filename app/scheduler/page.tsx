@@ -29,8 +29,8 @@ const blockColors = [
     "#f29f4c52",
 ];
 
- // Generate hour labels starting at 6 PM (18:00) through 18 hours (72 ticks / 4 ticks per hr)
-const startHour = 18; // 6 PM in 24h format
+ // Generate hour labels starting at 6 AM (18:00) through 18 hours (72 ticks / 4 ticks per hr)
+const startHour = 6; // 6 AM in 24h format
 const hours = Array.from({ length: 19 }, (_, i) => {
     const hour24 = (startHour + i) % 24;
     const period = hour24 >= 12 ? 'PM' : 'AM';
