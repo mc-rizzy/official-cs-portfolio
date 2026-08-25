@@ -168,9 +168,9 @@ export default function Page() {
 
                 return <Block
                     key={data.key}
-                    width={data.day && dayBounds[data.day]? dayBounds[data.day].width : data.width}
+                    width={(data.day !== undefined && data.day !== null) && dayBounds[data.day]? dayBounds[data.day].width : data.width}
                     height={calculatedHeight}
-                    x={data.day && dayBounds[data.day]? dayBounds[data.day].x : data.x}
+                    x={(data.day !== undefined && data.day !== null) && dayBounds[data.day]? dayBounds[data.day].x : data.x}
                     y={data.start? ((data.start-6)*4*verticalUnit)+containerPadding : data.y}
                     start={data.start}
                     end={data.end}
