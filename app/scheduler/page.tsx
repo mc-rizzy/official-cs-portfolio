@@ -98,6 +98,7 @@ export default function Page() {
     const currentDay = (new Date().getDay() + 6) % 7;
     const [selectedDay, setSelectedDay] = useState(0);
     const [blocks, setBlocks] = useState<any[]>(() => loadBlocksFromStorage<any[]>([]));
+    const [isMounted, setIsMounted] = useState(false);
     const [dayBounds, setDayBounds] = useState<{ [key: number]: { x: number; width: number } }>({});
     const days = useRef<any[]>([
         {i: 0, name: "Monday"}, 
@@ -395,14 +396,18 @@ export default function Page() {
     useEffect(() => {
         window.addEventListener('wheel', handleWheel, { passive: false });
 
+        if(isMounted == false){
+            setTimeout(()=>{
+                setSelectedDay(currentDay);
+            }, 1000)
+            setIsMounted(true);
+        }
+
         return () => {
             window.removeEventListener('wheel', handleWheel);
         };
     }, []);
 
-    setTimeout(()=>{
-        setSelectedDay(currentDay);
-    }, 1000)
 
     return (<>
         <CursorWrapper />
