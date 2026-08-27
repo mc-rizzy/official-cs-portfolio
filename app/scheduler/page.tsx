@@ -96,7 +96,7 @@ export const GridRuler = memo(function GridRuler({ gridHeight }: {gridHeight: st
 
 export default function Page() {
     const [selectedDay, setSelectedDay] = useState((new Date().getDay() + 6) % 7);
-    const [blocks, setBlocks] = useState<any[]>([]);
+    const [blocks, setBlocks] = useState<any[]>(() => loadBlocksFromStorage<any[]>([]));
     const [dayBounds, setDayBounds] = useState<{ [key: number]: { x: number; width: number } }>({});
     const days = useRef<any[]>([
         {i: 0, name: "Monday"}, 
@@ -157,11 +157,14 @@ export default function Page() {
 
             days.current = updatedDays;
         }
-        
+    }
+
+    const renderBlocks = () => {
+        if (!daysContainerRef.current) return null;
+        let verticalUnit = (daysContainerRef.current.clientHeight - 2*containerPadding) / 72;
+
         return(
             blocks.map((data: any, idx: any)=>{
-                if (!daysContainerRef.current) return;
-                let verticalUnit = (daysContainerRef.current.clientHeight - 2*containerPadding) / 72;
                 const calculatedHeight = (data.start !== "" && data.end !== "")
                     ? Math.max((data.end - data.start) * verticalUnit * 4, 15) // enforce min height
                     : data.height * verticalUnit * 4;
@@ -292,17 +295,29 @@ export default function Page() {
         const updateBounds = () => {
             const newBounds: { [key: number]: { x: number; width: number } } = {};
 
-            days.current.forEach((day) => {
-            const el = daysContainerRef.current?.querySelector(
-                `[data-index="${day.i}"]`
-            ) as HTMLElement;
+            // days.current.forEach((day) => {
+            //     const el = daysContainerRef.current?.querySelector(
+            //         `[data-index="${day.i}"]`
+            //     ) as HTMLElement;
 
-            if (el) {
+            //     if (el) {
+            //         const rect = el.getBoundingClientRect();
+            //         newBounds[day.i] = { x: rect.left, width: rect.width };
+            //     }
+            // });
+            const updatedDays = days.current.map((day) => {
+                const el = daysContainerRef.current?.querySelector(
+                    `[data-index="${day.i}"]`
+                ) as HTMLElement;
+
+                if (!el) return day;
+
                 const rect = el.getBoundingClientRect();
                 newBounds[day.i] = { x: rect.left, width: rect.width };
-            }
+                return { ...day, x: rect.left, width: rect.width };
             });
 
+            days.current = updatedDays;
             setDayBounds(newBounds);
         };
 
@@ -319,7 +334,7 @@ export default function Page() {
             observer.disconnect();
             window.removeEventListener('resize', updateBounds);
         };
-    }, [selectedDay, zoomData.columnScale]); // Re-attach when column setup or scale changes
+    }, [selectedDay, zoomData.columnScale, blocks.length]); // Re-attach when column setup or scale changes
 
     useEffect(() => {
         if (isInitialMount.current) {
@@ -357,9 +372,9 @@ export default function Page() {
 
     useEffect(() => {
         window.addEventListener('wheel', handleWheel, { passive: false });
-        const saved = loadBlocksFromStorage<any[]>([]);
-        if (saved.length > 0)
-            setBlocks(saved);
+        // const saved = loadBlocksFromStorage<any[]>([]);
+        // if (saved.length > 0)
+        //     setBlocks(saved);
 
         // clearing the saved cache
         // localStorage.removeItem('canvas_blocks_data');
@@ -377,7 +392,7 @@ export default function Page() {
             onImport={(importedBlocks) => setBlocks(importedBlocks)}
         />
         <div onContextMenu={handleContextMenu} style={{ touchAction: "none", cursor: "none", position: 'relative', width: '100vw', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', overflowX: 'hidden' }}>
-            {updateBlocks()}
+            {renderBlocks()}
             <GridRuler gridHeight={zoomData.gridHeight}/>
             <div
                 style={{
@@ -393,7 +408,7 @@ export default function Page() {
                 ref={daysContainerRef}
             >
                 {days.current.map((data, idx) => {
-                    const isSelected = data.i === selectedDay;
+                    const isSelected = (data.i === selectedDay);
                     const currentWidth = (isSelected ? selectedDayWidth : columnWidth) * zoomData.columnScale;
 
                     return (
