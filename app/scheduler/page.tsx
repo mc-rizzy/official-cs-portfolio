@@ -111,6 +111,7 @@ export default function Page() {
     const frameRef = useRef<number | null>(null);
     const undoList = useRef<typeof Block[]>([]);
     const isInitialMount = useRef(true);
+    const [isMounted, setIsMounted] = useState(false);
 
     const [zoomData, setZoomData] = useState({
         minScale: 1,
@@ -138,26 +139,6 @@ export default function Page() {
         }
         setBlocks((prevBlocks) => [...prevBlocks, newBlock]);
     };
-
-    const updateBlocks = () => {
-        if (daysContainerRef.current){
-            const updatedDays = days.current.map((day) => {
-                const el = daysContainerRef.current?.querySelector(
-                    `[data-index="${day.i}"]`
-                ) as HTMLElement;
-                if (!el) return day;
-
-                const rect = el.getBoundingClientRect();
-                return {
-                    ...day,
-                    x: rect.left,
-                    width: rect.width,
-                };
-            });
-
-            days.current = updatedDays;
-        }
-    }
 
     const renderBlocks = () => {
         if (!daysContainerRef.current) return null;
@@ -372,18 +353,35 @@ export default function Page() {
 
     useEffect(() => {
         window.addEventListener('wheel', handleWheel, { passive: false });
-        // const saved = loadBlocksFromStorage<any[]>([]);
-        // if (saved.length > 0)
-        //     setBlocks(saved);
-
-        // clearing the saved cache
-        // localStorage.removeItem('canvas_blocks_data');
-        // setBlocks([]);
 
         return () => {
             window.removeEventListener('wheel', handleWheel);
         };
-    }, []);    
+    }, []);
+
+    useEffect(() => {
+        setIsMounted(true);
+
+        const frame = requestAnimationFrame(() => {
+            if (!daysContainerRef.current) return;
+            const newBounds: { [key: number]: { x: number; width: number } } = {};
+
+            days.current.forEach((day) => {
+                const el = daysContainerRef.current?.querySelector(
+                    `[data-index="${day.i}"]`
+                ) as HTMLElement;
+
+                if (el) {
+                    const rect = el.getBoundingClientRect();
+                    newBounds[day.i] = { x: rect.left, width: rect.width };
+                }
+            });
+
+            setDayBounds(newBounds);
+        });
+
+        return () => cancelAnimationFrame(frame);
+    }, []);
 
     return (<>
         <CursorWrapper />
