@@ -111,7 +111,6 @@ export default function Page() {
     const frameRef = useRef<number | null>(null);
     const undoList = useRef<typeof Block[]>([]);
     const isInitialMount = useRef(true);
-    const [isMounted, setIsMounted] = useState(false);
 
     const [zoomData, setZoomData] = useState({
         minScale: 1,
@@ -248,6 +247,57 @@ export default function Page() {
         );
     }
 
+    const renderColumns = () => {
+        return (
+            <div
+                style={{
+                    paddingTop: `${containerPadding}px`,
+                    paddingBottom: `${containerPadding}px`,
+                    paddingLeft: `${rulerLeftOffset}px`, // Reserve space for the hour labels
+                    display: 'flex',
+                    gap: `${columnGap}px`,
+                    position: 'relative',
+                    zIndex: 1,
+                    pointerEvents: "none",
+                }}
+                ref={daysContainerRef}
+            >
+                {days.current.map((data, idx) => {
+                    const isSelected = (data.i === selectedDay);
+                    const currentWidth = (isSelected ? selectedDayWidth : columnWidth) * zoomData.columnScale;
+                    const currentBgColor = isSelected ? selectedColumnBackgroundColor : columnBackgroundColor;
+                    console.log(idx, isSelected);
+
+                    return (
+                        <div
+                            key={idx}
+                            data-index={idx}
+                            onClick={() => {
+                                setSelectedDay(data.i);
+                                setZoomData((prev) => {
+                                    return {
+                                        ...prev,
+                                        transitionWidth: columnWidthTransition,
+                                    }
+                                })
+                            }}
+                            style={{
+                                width: `${currentWidth}px`,
+                                height: zoomData.gridHeight,
+                                backgroundColor: currentBgColor,
+                                borderLeft: `1px solid ${columnBorderColor}`,
+                                borderRight: `1px solid ${columnBorderColor}`,
+                                boxSizing: 'border-box',
+                                transition: zoomData.transitionWidth,
+                                pointerEvents: "auto",
+                            }}
+                        />
+                    );
+                })}
+            </div>
+        );
+    }
+
     const handleWheel = (e: WheelEvent) => {
         if (!e.ctrlKey) return;
         e.preventDefault();
@@ -359,32 +409,6 @@ export default function Page() {
         };
     }, []);
 
-    useEffect(() => {
-        setIsMounted(true);
-
-        const frame = requestAnimationFrame(() => {
-            if (!daysContainerRef.current) return;
-            const newBounds: { [key: number]: { x: number; width: number } } = {};
-
-            days.current.forEach((day) => {
-                const el = daysContainerRef.current?.querySelector(
-                    `[data-index="${day.i}"]`
-                ) as HTMLElement;
-
-                if (el) {
-                    const rect = el.getBoundingClientRect();
-                    newBounds[day.i] = { x: rect.left, width: rect.width };
-                }
-            });
-
-            setDayBounds(newBounds);
-        });
-
-        return () => cancelAnimationFrame(frame);
-    }, []);
-
-    console.log(selectedDay)
-
     return (<>
         <CursorWrapper />
         <ImportExportButtons 
@@ -394,51 +418,7 @@ export default function Page() {
         <div onContextMenu={handleContextMenu} style={{ touchAction: "none", cursor: "none", position: 'relative', width: '100vw', minHeight: '100vh', backgroundColor: '#121212', color: '#fff', overflowX: 'hidden' }}>
             {renderBlocks()}
             <GridRuler gridHeight={zoomData.gridHeight}/>
-            <div
-                style={{
-                    paddingTop: `${containerPadding}px`,
-                    paddingBottom: `${containerPadding}px`,
-                    paddingLeft: `${rulerLeftOffset}px`, // Reserve space for the hour labels
-                    display: 'flex',
-                    gap: `${columnGap}px`,
-                    position: 'relative',
-                    zIndex: 1,
-                    pointerEvents: "none",
-                }}
-                ref={daysContainerRef}
-            >
-                {days.current.map((data, idx) => {
-                    const isSelected = (data.i === selectedDay);
-                    const currentWidth = (isSelected ? selectedDayWidth : columnWidth) * zoomData.columnScale;
-                    console.log(idx, isSelected);
-
-                    return (
-                        <div
-                            key={idx}
-                            data-index={idx}
-                            onClick={() => {
-                                setSelectedDay(data.i);
-                                setZoomData((prev) => {
-                                    return {
-                                        ...prev,
-                                        transitionWidth: columnWidthTransition,
-                                    }
-                                })
-                            }}
-                            style={{
-                                width: `${currentWidth}px`,
-                                height: zoomData.gridHeight,
-                                backgroundColor: isSelected ? selectedColumnBackgroundColor : columnBackgroundColor,
-                                borderLeft: `1px solid ${columnBorderColor}`,
-                                borderRight: `1px solid ${columnBorderColor}`,
-                                boxSizing: 'border-box',
-                                transition: zoomData.transitionWidth,
-                                pointerEvents: "auto",
-                            }}
-                        />
-                    );
-                })}
-            </div>
+            {renderColumns()}
         </div>
     </>);
 }
