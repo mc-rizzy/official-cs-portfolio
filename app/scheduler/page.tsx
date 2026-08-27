@@ -383,6 +383,8 @@ export default function Page() {
         return () => cancelAnimationFrame(frame);
     }, []);
 
+    console.log(selectedDay)
+
     return (<>
         <CursorWrapper />
         <ImportExportButtons 
