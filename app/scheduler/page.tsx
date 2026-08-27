@@ -248,6 +248,7 @@ export default function Page() {
     }
 
     const renderColumns = () => {
+        console.log(days.current[selectedDay]);
         return (
             <div
                 style={{
