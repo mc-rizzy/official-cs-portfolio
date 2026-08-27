@@ -267,6 +267,7 @@ export default function Page() {
                     const isSelected = (data.i === selectedDay);
                     const currentWidth = (isSelected ? selectedDayWidth : columnWidth) * zoomData.columnScale;
                     const currentBgColor = isSelected ? selectedColumnBackgroundColor : columnBackgroundColor;
+                    days.current[data.i].width = currentWidth;
                     console.log(data.i, isSelected);
 
                     return (
@@ -346,9 +347,6 @@ export default function Page() {
                 if (!el) return day;
 
                 const rect = el.getBoundingClientRect();
-                // const currentWidth = (isSelected ? selectedDayWidth : columnWidth) * zoomData.columnScale;
-                // const currentBgColor = isSelected ? selectedColumnBackgroundColor : columnBackgroundColor;
-
                 newBounds[day.i] = { x: rect.left, width: rect.width };
                 return { ...day, x: rect.left, width: rect.width };
             });
