@@ -410,6 +410,7 @@ export default function Page() {
                 {days.current.map((data, idx) => {
                     const isSelected = (data.i === selectedDay);
                     const currentWidth = (isSelected ? selectedDayWidth : columnWidth) * zoomData.columnScale;
+                    console.log(idx, isSelected);
 
                     return (
                         <div
