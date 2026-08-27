@@ -95,7 +95,8 @@ export const GridRuler = memo(function GridRuler({ gridHeight }: {gridHeight: st
 });
 
 export default function Page() {
-    const [selectedDay, setSelectedDay] = useState((new Date().getDay() + 6) % 7);
+    const currentDay = (new Date().getDay() + 6) % 7;
+    const [selectedDay, setSelectedDay] = useState(0);
     const [blocks, setBlocks] = useState<any[]>(() => loadBlocksFromStorage<any[]>([]));
     const [dayBounds, setDayBounds] = useState<{ [key: number]: { x: number; width: number } }>({});
     const days = useRef<any[]>([
@@ -248,7 +249,6 @@ export default function Page() {
     }
 
     const renderColumns = () => {
-        console.log(days.current[selectedDay]);
         return (
             <div
                 style={{
@@ -268,7 +268,6 @@ export default function Page() {
                     const currentWidth = (isSelected ? selectedDayWidth : columnWidth) * zoomData.columnScale;
                     const currentBgColor = isSelected ? selectedColumnBackgroundColor : columnBackgroundColor;
                     days.current[data.i].width = currentWidth;
-                    console.log(data.i, isSelected);
 
                     return (
                         <div
@@ -327,17 +326,6 @@ export default function Page() {
 
         const updateBounds = () => {
             const newBounds: { [key: number]: { x: number; width: number } } = {};
-
-            // days.current.forEach((day) => {
-            //     const el = daysContainerRef.current?.querySelector(
-            //         `[data-index="${day.i}"]`
-            //     ) as HTMLElement;
-
-            //     if (el) {
-            //         const rect = el.getBoundingClientRect();
-            //         newBounds[day.i] = { x: rect.left, width: rect.width };
-            //     }
-            // });
 
             const updatedDays = days.current.map((day) => {
                 const el = daysContainerRef.current?.querySelector(
@@ -411,6 +399,10 @@ export default function Page() {
             window.removeEventListener('wheel', handleWheel);
         };
     }, []);
+
+    setTimeout(()=>{
+        setSelectedDay(currentDay);
+    }, 1000)
 
     return (<>
         <CursorWrapper />
