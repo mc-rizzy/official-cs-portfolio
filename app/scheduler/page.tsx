@@ -236,7 +236,7 @@ export default function Page() {
                                     newColor = color;
                             })
                         if(!newColor)
-                            newColor = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 1)`;
+                            newColor = `rgba(${Math.random()*255}, ${Math.random()*255}, ${Math.random()*255}, 0.5)`;
                         console.log(newColor)
                         setBlocks((prev) => prev.map((b, i) => i === idx ? { ...b, 
                             name: name, 
