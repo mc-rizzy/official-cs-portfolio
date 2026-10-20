@@ -74,7 +74,7 @@ Fintech -> emphasize speed, reliability, model intelligence
 - Napcast
 
 Biotech -> emphasize anatomy, depth of research (niche), and organized flow of full-process work.
-- Volition
+- Volition, created AI and feature extractions for brainwave data. Also created AI mechanical code interface that allows graph neural network model reading EEG brainwaves to control a robotic prosthetic hand.
 - Autism and Neurotypical Motor functioons research
 - IBM would be better here.
 
@@ -86,8 +86,6 @@ Software Dev
 Maybe both -> Leadership
 - HackRPI
 - Executive Board
-
-
 
 
 

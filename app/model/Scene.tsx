@@ -66,12 +66,21 @@ const _modelResult = {
 	fov: 50,
 };
 
+function RPIModel({ onLoaded }: { onLoaded: () => void }) {
+	const { scene } = useGLTF(MODEL_URL);
+	useEffect(() => {
+		if (scene) onLoaded();
+	}, [scene, onLoaded]);
+	return <primitive object={scene} />;
+}
+
 function ModelInstance({ scale = 0.15, scrollY }: { scale?: number, scrollY: number }) {
 	const { scene } = useGLTF(MODEL_URL);
 	const modelRef = useRef<THREE.Object3D>(null);
 
 	const modelCurve = useMemo(() => buildCameraCurve(ModelPivots), []);
-	
+	const onLoaded = () => {};
+
 	useEffect(() => {
 		if (scene)
 			onLoaded();
