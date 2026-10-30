@@ -1,0 +1,25 @@
+{
+  "id": "volition-neural-control",
+  "slug": "volition-neural-control",
+  "title": "From brainwaves to robotic hands",
+  "subtitle": "How I built an EEG-to-prosthetic control interface — turning raw neural signals into a graph-neural-network model that drives a robotic hand.",
+  "author": "Caleb Liu",
+  "publishedAt": "2026-08-14T09:00:00.000Z",
+  "tags": ["Neuroscience", "Robotics", "GNN", "EEG", "PyTorch"],
+  "githubUrl": "https://github.com/mc-rizzy/volition",
+  "hero": { "video": true, "videoLabel": "Neural intent → robotic hand" },
+  "intro": "Raw EEG recordings are messy — muscle artifacts, electrical noise, and overlapping signals all mixed together. The goal was to extract the specific motor-cortex intent needed to control a robotic prosthetic hand, and to do it reliably enough to be useful outside the lab.",
+  "sections": [
+    { "type": "video", "label": "Neural intent → robotic hand", "caption": "A graph neural network reads motor-cortex signals and drives a robotic hand in a closed loop." },
+    { "type": "paragraph", "label": "The approach", "body": "I built an AI mechanical-code bridge: a feature-extraction pipeline that isolates the relevant neural signals, feeding them into a graph neural network that maps neural intent onto robotic hand movements." },
+    { "type": "paragraph", "label": "The approach", "body": "The key was treating the data as the hard part — cleaning, annotating, and validating the recordings before modeling, so the network learned real intent rather than noise." },
+    { "type": "image", "label": "Feature extraction", "caption": "Feature-extraction pipeline isolating motor-cortex signals from noisy EEG channels." },
+    { "type": "paragraph", "label": "The result", "body": "The interface translates neural intent into robotic hand movements with enough fidelity to demonstrate closed-loop control — the hand responds to the user's intent, not just their physical motion." },
+    { "type": "stats", "items": [
+      { "num": "EEG", "label": "Motor-cortex signal isolation from noisy recordings" },
+      { "num": "GNN", "label": "Graph neural network mapping intent to hand movement" },
+      { "num": "Closed-loop", "label": "Hand responds to neural intent, not physical motion" }
+    ] },
+    { "type": "callout", "body": "This is the kind of work that pairs brain-computer interfaces with assistive robotics to restore agency for people who need it." }
+  ]
+}

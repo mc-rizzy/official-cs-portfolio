@@ -1,0 +1,89 @@
+[
+  {
+    "slug": "volition-neural-control",
+    "title": "From brainwaves to robotic hands",
+    "subtitle": "How I built an EEG-to-prosthetic control interface — turning raw neural signals into a graph-neural-network model that drives a robotic hand.",
+    "intro": "A brain-computer interface that turns neural intent into robotic hand movement — and the data work that made it reliable enough to close the loop.",
+    "author": "Caleb Liu",
+    "date": "2026",
+    "tags": ["Neuroscience", "Robotics", "GNN", "EEG", "PyTorch"],
+    "githubUrl": "https://github.com/mc-rizzy/volition",
+    "sections": [
+      {
+        "label": "The problem",
+        "body": "Raw EEG recordings are messy — muscle artifacts, electrical noise, and overlapping signals all mixed together. The goal was to extract the specific motor-cortex intent needed to control a robotic prosthetic hand, and to do it reliably enough to be useful outside the lab."
+      },
+      {
+        "label": "The approach",
+        "body": "I built an AI mechanical-code bridge: a feature-extraction pipeline that isolates the relevant neural signals, feeding them into a graph neural network that maps neural intent onto robotic hand movements. The key was treating the data as the hard part — cleaning, annotating, and validating the recordings before modeling, so the network learned real intent rather than noise."
+      },
+      {
+        "label": "The result",
+        "body": "The interface translates neural intent into robotic hand movements with enough fidelity to demonstrate closed-loop control — the hand responds to the user's intent, not just their physical motion. This is the kind of work that pairs brain-computer interfaces with assistive robotics to restore agency for people who need it."
+      }
+    ],
+    "stats": [
+      { "num": "EEG", "label": "Motor-cortex signal isolation from noisy recordings" },
+      { "num": "GNN", "label": "Graph neural network mapping intent to hand movement" },
+      { "num": "Closed-loop", "label": "Hand responds to neural intent, not physical motion" }
+    ]
+  },
+  {
+    "slug": "neural-signal-pipeline",
+    "title": "Turning raw recordings into a research dataset",
+    "subtitle": "The messy-to-production data work that powers reliable biotech models — cleaning, annotating, and validating neural recordings end to end.",
+    "intro": "Neural recordings arrive dirty. Here's the pipeline that turns bad channels and mislabeled epochs into a consistent, reproducible dataset.",
+    "author": "Caleb Liu",
+    "date": "2026",
+    "tags": ["Signal Processing", "Data Pipeline", "PyTorch", "SQL"],
+    "githubUrl": "https://github.com/mc-rizzy/volition",
+    "sections": [
+      {
+        "label": "The problem",
+        "body": "Neural recordings arrive dirty — bad channels, dropped samples, and mislabeled epochs. A model trained on that data just memorizes the noise, so the first job is never the model, it's the data."
+      },
+      {
+        "label": "The approach",
+        "body": "I designed an end-to-end pipeline for cleaning, annotating, and feature-extracting neural recordings. Bad segments get flagged, epochs get labeled, and features get extracted — the kind of messy-to-production data work that powers reliable research models."
+      },
+      {
+        "label": "The result",
+        "body": "The pipeline keeps drift under 5% across cohorts and hands downstream models a consistent, well-annotated dataset. Clean data turned a research curiosity into something reproducible."
+      }
+    ],
+    "stats": [
+      { "num": "< 5%", "label": "Drift across cohorts" },
+      { "num": "3 stages", "label": "Clean → annotate → extract" },
+      { "num": "Reproducible", "label": "Versioned pipeline" }
+    ]
+  },
+  {
+    "slug": "autism-motor-analysis",
+    "title": "Quantifying motor signatures across cohorts",
+    "subtitle": "Turning clinical observations into a structured, reproducible dataset for downstream ML classification.",
+    "intro": "A pilot study that quantifies motor-function differences between cohorts — and whether those differences are measurable enough to classify.",
+    "author": "Caleb Liu",
+    "date": "2026",
+    "tags": ["Signal Processing", "ML", "Clinical Data", "Python"],
+    "githubUrl": "https://github.com/mc-rizzy/volition",
+    "sections": [
+      {
+        "label": "The problem",
+        "body": "Motor differences between cohorts are real but hard to see by eye. The question was whether those differences were measurable and structured enough to classify."
+      },
+      {
+        "label": "The approach",
+        "body": "I researched and quantified differences in motor-function signatures between autistic and neurotypical subjects, turning clinical observations into a structured, reproducible dataset for downstream ML classification."
+      },
+      {
+        "label": "The result",
+        "body": "The signatures separated cleanly enough to build a classifier on top of them. It's a research tool, not a diagnostic — but it shows the signal is there."
+      }
+    ],
+    "stats": [
+      { "num": "2 cohorts", "label": "Autistic vs neurotypical" },
+      { "num": "n=2", "label": "Pilot study" },
+      { "num": "Classifiable", "label": "Clear signature separation" }
+    ]
+  }
+]

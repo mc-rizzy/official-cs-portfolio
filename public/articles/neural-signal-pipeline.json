@@ -1,0 +1,23 @@
+{
+  "id": "neural-signal-pipeline",
+  "slug": "neural-signal-pipeline",
+  "title": "Turning raw recordings into a research dataset",
+  "subtitle": "The messy-to-production data work that powers reliable biotech models — cleaning, annotating, and validating neural recordings end to end.",
+  "author": "Caleb Liu",
+  "publishedAt": "2026-07-02T09:00:00.000Z",
+  "tags": ["Signal Processing", "Data Pipeline", "PyTorch", "SQL"],
+  "githubUrl": "https://github.com/mc-rizzy/volition",
+  "hero": { "video": false, "videoLabel": "Pipeline walkthrough" },
+  "intro": "Neural recordings arrive dirty — bad channels, dropped samples, and mislabeled epochs. A model trained on that data just memorizes the noise, so the first job is never the model, it's the data.",
+  "sections": [
+    { "type": "image", "label": "Clean → annotate → extract", "caption": "A three-stage pipeline that turns raw, noisy recordings into a versioned research dataset." },
+    { "type": "paragraph", "label": "The approach", "body": "I designed an end-to-end data pipeline for cleaning, annotating, and feature-extracting neural recordings — the kind of messy-to-production data work that powers reliable biotech research models." },
+    { "type": "paragraph", "label": "The approach", "body": "Versioning every stage meant the dataset could be reproduced and audited, so downstream models trained on trustworthy data rather than a one-off export." },
+    { "type": "stats", "items": [
+      { "num": "< 5%", "label": "Drift across cohorts" },
+      { "num": "3 stages", "label": "Clean → annotate → extract" },
+      { "num": "Reproducible", "label": "Versioned pipeline" }
+    ] },
+    { "type": "callout", "body": "The data, not the model, is the hard part — and getting it right is what makes the model honest." }
+  ]
+}

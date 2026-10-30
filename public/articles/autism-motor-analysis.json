@@ -1,0 +1,23 @@
+{
+  "id": "autism-motor-analysis",
+  "slug": "autism-motor-analysis",
+  "title": "Quantifying motor signatures across cohorts",
+  "subtitle": "Turning clinical observations into a structured, reproducible dataset for downstream ML classification.",
+  "author": "Caleb Liu",
+  "publishedAt": "2026-05-19T09:00:00.000Z",
+  "tags": ["Signal Processing", "ML", "Clinical Data", "Python"],
+  "githubUrl": "https://github.com/mc-rizzy/volition",
+  "hero": { "video": false, "videoLabel": "Motor signature study" },
+  "intro": "Motor differences between cohorts are real but hard to see by eye. The question was whether those differences were measurable and structured enough to classify.",
+  "sections": [
+    { "type": "video", "label": "Motor signature study", "caption": "Motor-function signatures separated between cohorts when quantified over time." },
+    { "type": "paragraph", "label": "The approach", "body": "I researched and quantified differences in motor-function signatures between autistic and neurotypical subjects, turning clinical observations into a structured, reproducible dataset for downstream ML classification." },
+    { "type": "paragraph", "label": "The result", "body": "The signatures separated cleanly enough to build a classifier on top of them. It's a research tool, not a diagnostic — but it shows the signal is there." },
+    { "type": "stats", "items": [
+      { "num": "2 cohorts", "label": "Autistic vs neurotypical" },
+      { "num": "n=2", "label": "Pilot study" },
+      { "num": "Classifiable", "label": "Clear signature separation" }
+    ] },
+    { "type": "callout", "body": "A research aid for spotting real structure in motor data — never a clinical diagnostic." }
+  ]
+}

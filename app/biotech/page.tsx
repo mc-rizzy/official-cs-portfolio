@@ -87,7 +87,7 @@ export default function BiotechHome() {
 
       {/* Nav */}
       <nav className={`bio-nav ${scrolled ? "scrolled" : ""}`}>
-        <div className="bio-logo">Volition</div>
+        <div className="bio-logo">Caleb Liu</div>
         <ul className="bio-nav-links">
           <li><a href="#overview" className="active">Overview</a></li>
           <li><a href="#value">Approach</a></li>
@@ -206,7 +206,7 @@ export default function BiotechHome() {
       {/* Footer */}
       <footer className="bio-footer">
         <div className="bio-footer-inner">
-          <div className="bio-logo" style={{ fontSize: "1rem" }}>Volition</div>
+          <div className="bio-logo" style={{ fontSize: "1rem" }}>Caleb Liu</div>
           <ul className="bio-socials">
             <li><a href="https://github.com/mc-rizzy" target="_blank" rel="noopener noreferrer">GitHub</a></li>
             <li><a href="https://linkedin.com/in/caleb-liu0/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>

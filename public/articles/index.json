@@ -1,0 +1,7 @@
+{
+  "articles": [
+    { "id": "volition-neural-control", "title": "From brainwaves to robotic hands", "publishedAt": "2026-08-14T09:00:00.000Z" },
+    { "id": "neural-signal-pipeline", "title": "Turning raw recordings into a research dataset", "publishedAt": "2026-07-02T09:00:00.000Z" },
+    { "id": "autism-motor-analysis", "title": "Quantifying motor signatures across cohorts", "publishedAt": "2026-05-19T09:00:00.000Z" }
+  ]
+}
