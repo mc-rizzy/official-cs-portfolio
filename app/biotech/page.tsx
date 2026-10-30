@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./biotech.css";
-import SignalField from "./Signalfield";
+import SignalField from "./SignalField";
+import PageEffects from "./PageEffects";
+import ContactCard from "./ContactCard";
 import { content } from "./Content";
 import { applyLens, resolveLens } from "./tailor";
 
 export const metadata: Metadata = {
-  title: "Neural engineering",
+  title: "Software for biotech",
   description:
-    "EEG decoding, graph neural networks, and assistive robotics: projects, current work, and contact.",
+    "Computer science student building ML models and data pipelines for neural and clinical data: projects, current work, and contact.",
 };
 
 const LEVEL_LABEL = { 3: "daily use", 2: "working knowledge", 1: "familiar" } as const;
 const STATE_LABEL = { done: "Done", active: "In progress", planned: "Planned" } as const;
+
+const vars = (v: Record<string, number>) => v as unknown as React.CSSProperties;
 
 export default async function BiotechPage({
   searchParams,
@@ -25,15 +29,19 @@ export default async function BiotechPage({
 
   return (
     <div className="bio">
-      <header className="top wrap">
-        <a href="#top" className="top-name">{profile.name}</a>
-        <nav className="top-nav" aria-label="Sections">
-          <a href="#current">Current work</a>
-          <a href="#projects">Projects</a>
-          <a href="#skills">Skills</a>
-          <a href="#background">Background</a>
-          <a href="#contact">Contact</a>
-        </nav>
+      <PageEffects />
+
+      <header className="top">
+        <div className="wrap top-in">
+          <a href="#top" className="top-name">{profile.name}</a>
+          <nav className="top-nav" aria-label="Sections">
+            <a href="#current">Current work</a>
+            <a href="#projects">Projects</a>
+            <a href="#skills">Skills</a>
+            <a href="#background">Background</a>
+            <a href="#contact">Contact</a>
+          </nav>
+        </div>
       </header>
 
       <section className="hero" id="top">
@@ -47,15 +55,17 @@ export default async function BiotechPage({
         </div>
 
         <dl className="wrap facts">
-          <div><dt>Focus</dt><dd>{profile.focus}</dd></div>
-          <div><dt>Affiliation</dt><dd>{profile.affiliation}</dd></div>
-          <div><dt>Location</dt><dd>{profile.location}</dd></div>
-          <div><dt>Status</dt><dd>{profile.status}</dd></div>
+          {profile.facts.map((f) => (
+            <div key={f.label}>
+              <dt>{f.label}</dt>
+              <dd>{f.value}</dd>
+            </div>
+          ))}
         </dl>
       </section>
 
       <main>
-        <section className="sec" id="current">
+        <section className="sec" id="current" data-reveal>
           <div className="wrap sec-grid">
             <h2>Current work</h2>
             <div className="plate">
@@ -63,8 +73,8 @@ export default async function BiotechPage({
               <h3>{current.title}</h3>
               <p>{current.summary}</p>
               <ol className="steps">
-                {current.milestones.map((m) => (
-                  <li key={m.label} data-state={m.state}>
+                {current.milestones.map((m, i) => (
+                  <li key={m.label} data-state={m.state} style={vars({ "--i": i })}>
                     <span>{m.label}</span>
                     <span className="state">{STATE_LABEL[m.state]}</span>
                   </li>
@@ -73,7 +83,7 @@ export default async function BiotechPage({
               {current.links && (
                 <p className="plate-links">
                   {current.links.map((l) => (
-                    <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer">
+                    <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="ulink">
                       {l.label}
                     </a>
                   ))}
@@ -83,7 +93,7 @@ export default async function BiotechPage({
           </div>
         </section>
 
-        <section className="sec" id="projects">
+        <section className="sec" id="projects" data-reveal>
           <div className="wrap sec-grid">
             <h2>Projects</h2>
             <div>
@@ -91,7 +101,7 @@ export default async function BiotechPage({
                 <article className="proj" key={p.id}>
                   <div className="proj-meta">
                     <div>{p.kind}</div>
-                    {p.period && <div>{p.period}</div>}
+                    {p.stage && <div>{p.stage}</div>}
                   </div>
                   <div>
                     <h3>{p.title}</h3>
@@ -105,7 +115,7 @@ export default async function BiotechPage({
                     <div className="proj-foot">
                       <span className="proj-tags">{p.tags.join(", ")}</span>
                       {p.articleId && (
-                        <Link href={`/articles/${p.articleId}`} className="proj-link">
+                        <Link href={`/articles/${p.articleId}`} className="proj-link ulink">
                           Write-up
                         </Link>
                       )}
@@ -115,7 +125,7 @@ export default async function BiotechPage({
                           href={l.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="proj-link"
+                          className="proj-link ulink"
                         >
                           {l.label}
                         </a>
@@ -128,13 +138,13 @@ export default async function BiotechPage({
           </div>
         </section>
 
-        <section className="sec" id="skills">
+        <section className="sec" id="skills" data-reveal>
           <div className="wrap sec-grid">
             <h2>Skills</h2>
             <div>
               <dl>
-                {skills.map((g) => (
-                  <div className="skill-row" key={g.group}>
+                {skills.map((g, gi) => (
+                  <div className="skill-row" key={g.group} style={vars({ "--g": gi })}>
                     <dt>{g.group}</dt>
                     <dd>
                       <ul className="skill-list">
@@ -143,7 +153,7 @@ export default async function BiotechPage({
                             {s.name}
                             <span className="meter" aria-hidden="true">
                               {[1, 2, 3].map((n) => (
-                                <i key={n} className={n <= s.level ? "on" : ""} />
+                                <i key={n} className={n <= s.level ? "on" : ""} style={vars({ "--n": n })} />
                               ))}
                             </span>
                             <span className="sr">{LEVEL_LABEL[s.level]}</span>
@@ -159,13 +169,13 @@ export default async function BiotechPage({
           </div>
         </section>
 
-        <section className="sec" id="background">
+        <section className="sec" id="background" data-reveal>
           <div className="wrap sec-grid">
             <h2>Background</h2>
             <div>
               {background.map((b) => (
                 <div className="bg-row" key={b.org}>
-                  <div className="proj-meta">{b.period}</div>
+                  <div className="proj-meta">{b.kind}</div>
                   <div>
                     <h3>{b.org}</h3>
                     <p className="proj-role">{b.role}</p>
@@ -177,36 +187,17 @@ export default async function BiotechPage({
           </div>
         </section>
 
-        <section className="sec" id="contact">
+        <section className="sec" id="contact" data-reveal>
           <div className="wrap sec-grid">
             <h2>Contact</h2>
-            <div className="card">
-              <h3>{profile.name}</h3>
-              <p>{contact.blurb}</p>
-              <dl className="card-rows">
-                <div>
-                  <dt>Email</dt>
-                  <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
-                </div>
-                {contact.links.map((l) => (
-                  <div key={l.url}>
-                    <dt>{l.label}</dt>
-                    <dd>
-                      <a href={l.url} target="_blank" rel="noopener noreferrer">
-                        {l.url.replace(/^https?:\/\//, "")}
-                      </a>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
+            <ContactCard name={profile.name} blurb={contact.blurb} links={contact.links} />
           </div>
         </section>
       </main>
 
       <footer className="wrap foot">
         <span>{profile.name}</span>
-        <span>{new Date().getFullYear()}</span>
+        <span>{profile.role}</span>
       </footer>
     </div>
   );

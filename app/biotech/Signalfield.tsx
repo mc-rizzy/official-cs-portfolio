@@ -4,10 +4,15 @@ import { useEffect, useRef } from "react";
 
 /* Eight scalp channels (10-20 system names). Left of the divider is
    raw EEG with noise and an eye-blink artifact; right is filtered.
-   Move the pointer to slide the divider. */
+   On load the filter sweeps in; after that the divider drifts until
+   the pointer takes over. A chart-recorder grid scrolls behind it. */
 const CHANNELS = ["Fp1", "F3", "C3", "P3", "O1", "C4", "P4", "O2"];
-const LEFT = 44;
+const LABEL_X = 20;
+const LEFT = 64;
 const STEP = 2;
+const GRID = 40;
+const GRID_SPEED = 50;
+const INTRO = 2400; // ms
 
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -27,21 +32,34 @@ export default function SignalField() {
     const ink = col("--ink");
     const muted = col("--muted");
     const signal = col("--signal");
+    const rule = col("--rule");
     const font = style.fontFamily;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const hint = window.matchMedia("(pointer: coarse)").matches
+      ? "Drag across the signal"
+      : "Move across the signal";
 
     let w = 0;
     let h = 0;
     let raf = 0;
     let visible = true;
     let hover = false;
-    let target = 0.5;
-    let boundary = 0.5;
+    let started = false;
+    let t0 = 0;
+    let hintAlpha = 1;
+    let target = reduce ? 0.5 : 1;
+    let boundary = target;
 
     const draw = (time: number) => {
-      const t = reduce ? 0 : time / 1000;
-      if (!hover) target = 0.5 + (reduce ? 0 : 0.12 * Math.sin(t * 0.25));
-      boundary = reduce ? target : boundary + (target - boundary) * 0.08;
+      const t = reduce ? 0 : (time - t0) / 1000;
+      const intro = reduce ? 1 : Math.min(1, (t * 1000) / INTRO);
+      const ease = 1 - Math.pow(1 - intro, 3);
+
+      if (!hover) {
+        const idleT = Math.max(0, t - INTRO / 1000);
+        target = intro < 1 ? 1 - 0.5 * ease : 0.5 + (reduce ? 0 : 0.14 * Math.sin(idleT * 0.35));
+      }
+      boundary = reduce ? target : boundary + (target - boundary) * 0.1;
 
       const bx = LEFT + (w - LEFT) * boundary;
       const rows = CHANNELS.length;
@@ -50,9 +68,27 @@ export default function SignalField() {
 
       ctx.clearRect(0, 0, w, h);
       ctx.font = `11px ${font}`;
+      ctx.lineJoin = "round";
+
+      /* scrolling recorder grid */
+      const shift = t * GRID_SPEED;
+      const k = Math.floor(shift / GRID);
+      const start = LEFT - (shift % GRID);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = rule;
+      for (let i = 0; start + i * GRID <= w; i++) {
+        const x = start + i * GRID;
+        if (x < LEFT) continue;
+        ctx.globalAlpha = (k + i) % 5 === 0 ? 0.9 : 0.4;
+        ctx.beginPath();
+        ctx.moveTo(x + 0.5, 0);
+        ctx.lineTo(x + 0.5, h);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
       ctx.textBaseline = "middle";
       ctx.textAlign = "left";
-      ctx.lineJoin = "round";
 
       for (let i = 0; i < rows; i++) {
         const y0 = rowH * (i + 0.5);
@@ -81,9 +117,9 @@ export default function SignalField() {
 
         const path = () => {
           ctx.beginPath();
-          ys.forEach((y, k) => {
-            const x = LEFT + k * STEP;
-            if (k) ctx.lineTo(x, y);
+          ys.forEach((y, n) => {
+            const x = LEFT + n * STEP;
+            if (n) ctx.lineTo(x, y);
             else ctx.moveTo(x, y);
           });
         };
@@ -109,9 +145,10 @@ export default function SignalField() {
         ctx.restore();
 
         ctx.fillStyle = muted;
-        ctx.fillText(CHANNELS[i], 0, y0);
+        ctx.fillText(CHANNELS[i], LABEL_X, y0);
       }
 
+      /* divider */
       ctx.strokeStyle = ink;
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -125,6 +162,29 @@ export default function SignalField() {
       ctx.fillText("raw", bx - 8, 8);
       ctx.textAlign = "left";
       ctx.fillText("filtered", bx + 8, 8);
+
+      /* affordance: pulsing handle + hint until first interaction */
+      const a = hintAlpha * intro;
+      if (a > 0.01) {
+        const pulse = (t * 0.8) % 1;
+        ctx.strokeStyle = signal;
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = a * (1 - pulse);
+        ctx.beginPath();
+        ctx.arc(bx, h / 2, 6 + pulse * 18, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = a;
+        ctx.fillStyle = signal;
+        ctx.beginPath();
+        ctx.arc(bx, h / 2, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = muted;
+        ctx.textAlign = "right";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(hint, w - LABEL_X, h - 12);
+        ctx.globalAlpha = 1;
+      }
+      if (hover) hintAlpha = Math.max(0, hintAlpha - 0.04);
     };
 
     const resize = () => {
@@ -142,7 +202,10 @@ export default function SignalField() {
       const r = canvas.getBoundingClientRect();
       hover = true;
       target = Math.min(1, Math.max(0, (e.clientX - r.left - LEFT) / (w - LEFT)));
-      if (reduce) draw(0);
+      if (reduce) {
+        hintAlpha = 0;
+        draw(0);
+      }
     };
     const onLeave = () => {
       hover = false;
@@ -150,6 +213,10 @@ export default function SignalField() {
     };
 
     const loop = (time: number) => {
+      if (!started) {
+        started = true;
+        t0 = time;
+      }
       if (visible) draw(time);
       raf = requestAnimationFrame(loop);
     };

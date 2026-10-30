@@ -3,6 +3,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Custom cursor colors (Cursor.tsx). Defined here so every route gets them,
+     not just the ones that import home.css. */
+  --color-accent: #decbb7;
+  --color-accent-opaque: #decbb79f;
+  --color-accent-subtle: #decbb731;
 }
 
 @theme inline {

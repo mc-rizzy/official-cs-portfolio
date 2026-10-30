@@ -7,8 +7,8 @@
 export interface Project {
   id: string;
   title: string;
-  kind: "Prototype" | "Research" | "Publication";
-  period?: string;
+  kind: "Machine learning" | "Data engineering" | "Software" | "Research" | "Writing";
+  stage?: string; // timeless status, e.g. "Completed", "Ongoing"
   role?: string;
   summary: string;
   outcome?: string;
@@ -36,12 +36,10 @@ export interface Milestone {
 export interface Content {
   profile: {
     name: string;
+    role: string;
     headline: string;
     summary: string;
-    affiliation: string;
-    location: string;
-    status: string;
-    focus: string;
+    facts: { label: string; value: string }[];
   };
   current: {
     title: string;
@@ -52,31 +50,34 @@ export interface Content {
   };
   projects: Project[];
   skills: SkillGroup[];
-  background: { org: string; role: string; period?: string; note?: string }[];
+  background: { org: string; role: string; kind: string; note?: string }[];
   contact: {
     blurb: string;
-    email: string;
-    links: { label: string; url: string }[];
+    links: { label: string; url: string }[]; // email is intentionally not here; the form sends it
   };
 }
 
 export const content: Content = {
   profile: {
     name: "Caleb Liu",
-    headline: "Turning noisy brain signals into movement.",
+    role: "Software and ML engineering for biotech",
+    headline: "I build software for biotech.",
     summary:
-      "I build the data pipelines and graph neural networks that let EEG control a robotic prosthetic hand. Most of the work happens before the model: cleaning, annotating, and validating recordings until the network learns intent instead of noise.",
-    affiliation: "Rensselaer Polytechnic Institute",
-    location: "Albany, NY",
-    status: "Open to 2027 internships",
-    focus: "Neural decoding, assistive robotics",
+      "Computer science student building the machine learning models and data pipelines behind a brain-controlled robotic hand, plus the tooling that cleans and validates the neural and clinical data feeding them.",
+    facts: [
+      { label: "Studying", value: "Computer Science, Rensselaer Polytechnic Institute" },
+      { label: "Roles", value: "Software, machine learning, and data engineering" },
+      { label: "Domain", value: "Biotech, neural and clinical data" },
+      { label: "Status", value: "Open to 2027 internships" },
+      { label: "Location", value: "Albany, NY" },
+    ],
   },
 
   current: {
-    title: "Volition 2.0: closed-loop neural control",
+    title: "Volition 2.0: real-time brain-controlled hand",
     status: "In development",
     summary:
-      "Extending the EEG-to-prosthetic interface into a closed-loop system: continuous decoding, real-time intent prediction, and haptic feedback so the hand responds to intent before the movement completes.",
+      "Extending the EEG-to-robotic-hand system into a closed loop: continuous decoding, real-time intent prediction, and haptic feedback so the hand responds to intent before the movement completes.",
     milestones: [
       { label: "Open-loop EEG to hand control", state: "done" },
       { label: "Continuous neural decoding", state: "active" },
@@ -89,12 +90,12 @@ export const content: Content = {
   projects: [
     {
       id: "volition",
-      title: "EEG-to-prosthetic control interface",
-      kind: "Prototype",
-      period: "2026",
-      role: "Sole developer",
+      title: "Brain-controlled robotic hand",
+      kind: "Machine learning",
+      stage: "Ongoing",
+      role: "Software and ML engineer, solo",
       summary:
-        "A bridge between a graph neural network and a robotic hand. Feature-extraction pipelines isolate motor-cortex signals from noisy EEG, and the network maps them to hand movements.",
+        "A Python and PyTorch system that reads EEG, extracts motor-cortex features, and uses a graph neural network to map them to robotic hand movements.",
       outcome: "Closed-loop demo: the hand responds to neural intent, not physical motion.",
       tags: ["eeg", "gnn", "pytorch", "robotics", "c++", "neural decoding", "bci"],
       articleId: "volition-neural-control",
@@ -102,9 +103,10 @@ export const content: Content = {
     },
     {
       id: "signal-pipeline",
-      title: "Neural signal processing pipeline",
-      kind: "Research",
-      period: "2026",
+      title: "EEG data pipeline",
+      kind: "Data engineering",
+      stage: "Completed",
+      role: "Data engineer",
       summary:
         "End-to-end cleaning, annotation, and feature extraction for neural recordings. Bad channels and mislabeled epochs are flagged before any model sees them.",
       outcome: "Drift under 5% across cohorts; every stage versioned and reproducible.",
@@ -113,19 +115,22 @@ export const content: Content = {
     },
     {
       id: "motor-analysis",
-      title: "Autistic vs. neurotypical motor signatures",
-      kind: "Research",
-      period: "2026",
+      title: "Motor-function classifier",
+      kind: "Machine learning",
+      stage: "Pilot study",
+      role: "ML and data analysis",
       summary:
-        "Quantified differences in motor-function signatures between cohorts and turned clinical observations into a structured dataset for ML classification.",
-      outcome: "Pilot study (n=2): signatures separated cleanly enough to train a classifier. A research aid, not a diagnostic.",
+        "Quantified differences in motor-function signatures between autistic and neurotypical subjects and turned clinical observations into a structured dataset for classification.",
+      outcome: "Pilot (n=2): signatures separated cleanly enough to train a classifier. A research aid, not a diagnostic.",
       tags: ["signal processing", "ml", "clinical data", "python", "classification"],
       articleId: "autism-motor-analysis",
     },
     {
       id: "health-automation",
-      title: "Healthcare data automation",
-      kind: "Prototype",
+      title: "Health records cleaning automation",
+      kind: "Data engineering",
+      stage: "Completed",
+      role: "Software engineer",
       summary:
         "Automated cleaning and validation of health records, turning unstructured clinical data into model-ready tables.",
       outcome: "4x faster than the manual process.",
@@ -135,28 +140,32 @@ export const content: Content = {
       id: "ibm",
       title: "IBM research collaboration",
       kind: "Research",
+      stage: "Collaboration",
+      role: "Research collaborator",
       summary:
         "Contributed to work on neural computing and brain-inspired architectures, applying deep learning to structured biomedical data and hardware-accelerated inference.",
       tags: ["ibm", "neural computing", "bioml", "inference", "deep learning"],
     },
     {
       id: "whitepaper",
-      title: "Neural decoding for assistive robotics",
-      kind: "Publication",
+      title: "Whitepaper: neural decoding for assistive robotics",
+      kind: "Writing",
+      stage: "Completed",
+      role: "Author",
       summary:
-        "Whitepaper on methodology, reproducibility, and the clinical path from lab prototype to a real assistive device.",
+        "Methodology, reproducibility, and the clinical path from lab prototype to a real assistive device.",
       tags: ["writing", "robotics", "neuroscience", "reproducibility"],
     },
   ],
 
   skills: [
     {
-      group: "Neural data",
+      group: "Languages",
       items: [
-        { name: "EEG", level: 3 },
-        { name: "Signal processing", level: 3 },
-        { name: "Feature extraction", level: 3 },
-        { name: "Artifact rejection", level: 2 },
+        { name: "Python", level: 3 },
+        { name: "TypeScript", level: 3 },
+        { name: "SQL", level: 3 },
+        { name: "C++", level: 2 },
       ],
     },
     {
@@ -171,32 +180,41 @@ export const content: Content = {
     {
       group: "Data engineering",
       items: [
-        { name: "Python", level: 3 },
-        { name: "SQL", level: 3 },
         { name: "ETL pipelines", level: 3 },
+        { name: "Data cleaning", level: 3 },
+        { name: "Feature extraction", level: 3 },
         { name: "Dataset versioning", level: 2 },
       ],
     },
     {
-      group: "Systems",
+      group: "Web",
       items: [
-        { name: "C++", level: 2 },
-        { name: "Robotics interfaces", level: 2 },
-        { name: "TypeScript", level: 3 },
         { name: "Next.js", level: 3 },
+        { name: "React", level: 3 },
+        { name: "Node.js", level: 2 },
+        { name: "Three.js", level: 2 },
+      ],
+    },
+    {
+      group: "Biotech domain",
+      items: [
+        { name: "EEG", level: 3 },
+        { name: "Signal processing", level: 3 },
+        { name: "Artifact rejection", level: 2 },
+        { name: "Clinical data", level: 2 },
       ],
     },
   ],
 
   background: [
-    { org: "IBM", role: "Research contributor", note: "Neural computing and brain-inspired architectures." },
-    { org: "HackRPI", role: "Executive board", note: "Runs the hackathon; built the event website." },
-    { org: "RPI Union", role: "Full-stack engineer" },
+    { org: "Rensselaer Polytechnic Institute", role: "Computer Science major", kind: "Education" },
+    { org: "IBM", role: "Research collaborator", kind: "Research", note: "Neural computing and brain-inspired architectures." },
+    { org: "RPI Union", role: "Full-stack engineer", kind: "Engineering" },
+    { org: "HackRPI", role: "Executive board", kind: "Leadership", note: "Runs the hackathon; built the event website." },
   ],
 
   contact: {
-    blurb: "Looking for 2027 internships in neural engineering, biomedical ML, or assistive robotics.",
-    email: "hello@calebliu.com",
+    blurb: "Looking for 2027 software, ML, or data engineering internships in biotech and health tech.",
     links: [
       { label: "LinkedIn", url: "https://linkedin.com/in/caleb-liu0/" },
       { label: "GitHub", url: "https://github.com/mc-rizzy" },
