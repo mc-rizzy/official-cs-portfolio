@@ -1,4 +1,4 @@
-import type { Content } from "./content";
+import type { Content } from "./Content";
 
 /* A Lens only SELECTS, ORDERS, and REWORDS existing content.
    It can never add a project or skill that isn't in content.ts. */
