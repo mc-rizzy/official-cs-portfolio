@@ -1,219 +1,212 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
+import "./biotech.css";
+import SignalField from "./Signalfield";
+import { content } from "./Content";
+import { applyLens, resolveLens } from "./tailor";
 
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import "../biotech/biotech.css";
-import BioProjectCard, { type BioProjectData } from "./BioProjectCard";
-import ContactForm from "../components/contactForm";
+export const metadata: Metadata = {
+  title: "Neural engineering",
+  description:
+    "EEG decoding, graph neural networks, and assistive robotics: projects, current work, and contact.",
+};
 
-const BrainScene = dynamic(() => import("./brain"), { ssr: false, loading: () => null });
+const LEVEL_LABEL = { 3: "daily use", 2: "working knowledge", 1: "familiar" } as const;
+const STATE_LABEL = { done: "Done", active: "In progress", planned: "Planned" } as const;
 
-const bioProjects: BioProjectData[] = [
-  {
-    title: "EEG-to-Prosthetic Control Interface",
-    description:
-      "Built an AI mechanical-code bridge that lets a graph neural network read raw EEG brainwaves and translate neural intent into robotic hand movements. Developed feature extraction pipelines to isolate motor-cortex signals from noisy recordings.",
-    category: "Prototype",
-    tags: ["PyTorch", "EEG", "GNN", "Robotics", "C++"],
-    githubUrl: "https://github.com/mc-rizzy/volition",
-    featuredMetric: "GNN → Hand",
-    videoLabel: "Neural intent → robotic hand",
-  },
-  {
-    title: "Autism vs. Neurotypical Motor Analysis",
-    description:
-      "Researched and quantified differences in motor-function signatures between autistic and neurotypical subjects, turning clinical observations into a structured, reproducible dataset for downstream ML classification.",
-    category: "Research",
-    tags: ["Signal Processing", "ML", "Clinical Data", "Python"],
-    featuredMetric: "n=2 cohorts",
-    videoLabel: "Motor signature study",
-  },
-  {
-    title: "Neural Signal Processing Pipeline",
-    description:
-      "Designed an end-to-end data pipeline for cleaning, annotating, and feature-extracting neural recordings — the kind of messy-to-production data work that powers reliable biotech research models.",
-    category: "Research",
-    tags: ["Signal Processing", "Data Pipeline", "PyTorch", "SQL"],
-    featuredMetric: "< 5% drift",
-    videoLabel: "Pipeline walkthrough",
-  },
-  {
-    title: "Biotech Research Whitepaper",
-    description:
-      "Authored a technical whitepaper on applying neural decoding to assistive robotics, covering methodology, reproducibility, and the clinical path from lab prototype to real-world assistive device.",
-    category: "Publication",
-    tags: ["Paper", "Robotics", "Neuroscience", "Writing"],
-    featuredMetric: "Peer-reviewed",
-    videoLabel: "Read the paper",
-  },
-  {
-    title: "IBM Research Collaboration",
-    description:
-      "Contributed to IBM research efforts on neural-computing and brain-inspired architectures, applying deep-learning techniques to structured biomedical data and hardware-accelerated inference.",
-    category: "Research",
-    tags: ["IBM", "Neural Computing", "BioML", "Inference"],
-    featuredMetric: "HW-accelerated",
-    videoLabel: "IBM research work",
-  },
-  {
-    title: "Healthcare Data Automation",
-    description:
-      "Automated health-record cleaning and validation workflows, removing the messy-data bottleneck that slows biotech research — turning unstructured clinical records into model-ready tables.",
-    category: "Prototype",
-    tags: ["Python", "ETL", "Health Records", "Automation"],
-    featuredMetric: "4x faster",
-    videoLabel: "Data automation demo",
-  },
-];
-
-export default function BiotechHome() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+export default async function BiotechPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ for?: string }>;
+}) {
+  const { for: lensKey } = await searchParams;
+  const c = applyLens(content, resolveLens(lensKey));
+  const { profile, current, projects, skills, background, contact } = c;
 
   return (
-    <div className="bio-root">
-      {/* Fixed 3D brain background */}
-      <div className="bio-bg">
-        <BrainScene />
-      </div>
+    <div className="bio">
+      <header className="top wrap">
+        <a href="#top" className="top-name">{profile.name}</a>
+        <nav className="top-nav" aria-label="Sections">
+          <a href="#current">Current work</a>
+          <a href="#projects">Projects</a>
+          <a href="#skills">Skills</a>
+          <a href="#background">Background</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </header>
 
-      {/* Fixed dark scrim for readable overlaid text */}
-      <div className="bio-scrim" />
-
-      {/* Nav */}
-      <nav className={`bio-nav ${scrolled ? "scrolled" : ""}`}>
-        <div className="bio-logo">Caleb Liu</div>
-        <ul className="bio-nav-links">
-          <li><a href="#overview" className="active">Overview</a></li>
-          <li><a href="#value">Approach</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#featured">Featured</a></li>
-          <li><a href="https://github.com/mc-rizzy" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-        </ul>
-      </nav>
-
-      {/* Scrollable content */}
-      <div className="bio-main">
-        {/* Hero / Overview */}
-        <section id="overview" className="bio-hero">
-          <span className="bio-eyebrow">
-            <span className="dot" />
-            Neuroscience · Assistive Robotics · Deep Learning
-          </span>
-          <h1 className="bio-wordmark">
-            Decoding <span className="grad">brainwaves</span> into movement
-          </h1>
-          <p className="bio-lede">
-            I turn raw neural signals into something useful — from isolating motor-cortex
-            intent in EEG recordings to feeding a graph neural network that drives a
-            robotic prosthetic hand. Deep research, full-process engineering.
-          </p>
-          <div className="bio-actions">
-            <a href="#projects" className="bio-btn bio-btn-primary">
-              Explore the work
-            </a>
-            <a href="#featured" className="bio-btn bio-btn-ghost">
-              Current project
-            </a>
-          </div>
-          <div className="bio-scroll-hint">
-            <span>Scroll</span>
-          </div>
-        </section>
-
-        {/* Value / Approach */}
-        <section id="value" className="bio-section">
-          <div className="bio-section-head">
-            <span className="bio-section-label">How I work</span>
-            <div className="line" />
-          </div>
-          <div className="bio-value-grid">
-            <div className="bio-value-card">
-              <span className="bio-value-num">01</span>
-              <h3 className="bio-value-title">Deep research</h3>
-              <p className="bio-value-text">
-                I don't just apply models — I dig into the data, the biology, and the
-                failure modes. Every project starts with understanding the problem, not
-                the tool.
-              </p>
-            </div>
-            <div className="bio-value-card">
-              <span className="bio-value-num">02</span>
-              <h3 className="bio-value-title">Full-process engineering</h3>
-              <p className="bio-value-text">
-                From messy, unstructured signals to clean, reproducible pipelines. I own
-                the whole flow — cleaning, feature extraction, modeling, validation.
-              </p>
-            </div>
-            <div className="bio-value-card">
-              <span className="bio-value-num">03</span>
-              <h3 className="bio-value-title">Real impact</h3>
-              <p className="bio-value-text">
-                The goal is always agency: restoring movement, restoring function,
-                restoring what a signal can mean for a person.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Projects */}
-        <section id="projects" className="bio-section">
-          <div className="bio-section-head">
-            <span className="bio-section-label">Research & Prototypes</span>
-            <div className="line" />
-          </div>
-          <div className="bio-grid">
-            {bioProjects.map((p, i) => (
-              <BioProjectCard key={p.title} project={p} index={i} />
-            ))}
-          </div>
-        </section>
-
-        {/* Featured project */}
-        <section id="featured" className="bio-section">
-          <div className="bio-section-head">
-            <span className="bio-section-label">Currently Building</span>
-            <div className="line" />
-          </div>
-          <div className="bio-featured">
-            <span className="bio-status">
-              <span className="pulse" />
-              In development
-            </span>
-            <h2 className="bio-wordmark" style={{ fontSize: "clamp(1.6rem, 4vw, 2.5rem)", fontWeight: 700, marginBottom: "1rem" }}>
-              Volition 2.0 — Closed-loop neural control
-            </h2>
-            <p className="bio-lede" style={{ marginBottom: 0 }}>
-              Advancing the EEG-to-prosthetic interface into a fully closed-loop system:
-              continuous neural decoding, real-time intent prediction, and haptic feedback
-              so the robotic hand responds to the user's intent before movement completes.
-              Pairing brain-computer interfaces with assistive robotics to restore agency.
-            </p>
-          </div>
-        </section>
-
-        {/* Contact */}
-        <section id="contact" className="bio-section">
-          <ContactForm />
-        </section>
-      </div>
-
-      {/* Footer */}
-      <footer className="bio-footer">
-        <div className="bio-footer-inner">
-          <div className="bio-logo" style={{ fontSize: "1rem" }}>Caleb Liu</div>
-          <ul className="bio-socials">
-            <li><a href="https://github.com/mc-rizzy" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-            <li><a href="https://linkedin.com/in/caleb-liu0/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-            <li><a href="mailto:hello@calebliu.com">Email</a></li>
-          </ul>
-          <div className="bio-copy">© {new Date().getFullYear()} Caleb Liu. Built with React Three Fiber.</div>
+      <section className="hero" id="top">
+        <div className="wrap hero-text">
+          <h1>{profile.headline}</h1>
+          <p className="hero-sub">{profile.summary}</p>
         </div>
+
+        <div className="field">
+          <SignalField />
+        </div>
+
+        <dl className="wrap facts">
+          <div><dt>Focus</dt><dd>{profile.focus}</dd></div>
+          <div><dt>Affiliation</dt><dd>{profile.affiliation}</dd></div>
+          <div><dt>Location</dt><dd>{profile.location}</dd></div>
+          <div><dt>Status</dt><dd>{profile.status}</dd></div>
+        </dl>
+      </section>
+
+      <main>
+        <section className="sec" id="current">
+          <div className="wrap sec-grid">
+            <h2>Current work</h2>
+            <div className="plate">
+              <span className="status">{current.status}</span>
+              <h3>{current.title}</h3>
+              <p>{current.summary}</p>
+              <ol className="steps">
+                {current.milestones.map((m) => (
+                  <li key={m.label} data-state={m.state}>
+                    <span>{m.label}</span>
+                    <span className="state">{STATE_LABEL[m.state]}</span>
+                  </li>
+                ))}
+              </ol>
+              {current.links && (
+                <p className="plate-links">
+                  {current.links.map((l) => (
+                    <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer">
+                      {l.label}
+                    </a>
+                  ))}
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <section className="sec" id="projects">
+          <div className="wrap sec-grid">
+            <h2>Projects</h2>
+            <div>
+              {projects.map((p) => (
+                <article className="proj" key={p.id}>
+                  <div className="proj-meta">
+                    <div>{p.kind}</div>
+                    {p.period && <div>{p.period}</div>}
+                  </div>
+                  <div>
+                    <h3>{p.title}</h3>
+                    {p.role && <p className="proj-role">{p.role}</p>}
+                    <p>{p.summary}</p>
+                    {p.outcome && (
+                      <p>
+                        <strong>Result.</strong> {p.outcome}
+                      </p>
+                    )}
+                    <div className="proj-foot">
+                      <span className="proj-tags">{p.tags.join(", ")}</span>
+                      {p.articleId && (
+                        <Link href={`/articles/${p.articleId}`} className="proj-link">
+                          Write-up
+                        </Link>
+                      )}
+                      {p.links?.map((l) => (
+                        <a
+                          key={l.url}
+                          href={l.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="proj-link"
+                        >
+                          {l.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="sec" id="skills">
+          <div className="wrap sec-grid">
+            <h2>Skills</h2>
+            <div>
+              <dl>
+                {skills.map((g) => (
+                  <div className="skill-row" key={g.group}>
+                    <dt>{g.group}</dt>
+                    <dd>
+                      <ul className="skill-list">
+                        {g.items.map((s) => (
+                          <li className="skill" data-focus={!!s.focus} key={s.name}>
+                            {s.name}
+                            <span className="meter" aria-hidden="true">
+                              {[1, 2, 3].map((n) => (
+                                <i key={n} className={n <= s.level ? "on" : ""} />
+                              ))}
+                            </span>
+                            <span className="sr">{LEVEL_LABEL[s.level]}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="legend">Bars show daily use, working knowledge, or familiarity.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="sec" id="background">
+          <div className="wrap sec-grid">
+            <h2>Background</h2>
+            <div>
+              {background.map((b) => (
+                <div className="bg-row" key={b.org}>
+                  <div className="proj-meta">{b.period}</div>
+                  <div>
+                    <h3>{b.org}</h3>
+                    <p className="proj-role">{b.role}</p>
+                    {b.note && <p>{b.note}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="sec" id="contact">
+          <div className="wrap sec-grid">
+            <h2>Contact</h2>
+            <div className="card">
+              <h3>{profile.name}</h3>
+              <p>{contact.blurb}</p>
+              <dl className="card-rows">
+                <div>
+                  <dt>Email</dt>
+                  <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+                </div>
+                {contact.links.map((l) => (
+                  <div key={l.url}>
+                    <dt>{l.label}</dt>
+                    <dd>
+                      <a href={l.url} target="_blank" rel="noopener noreferrer">
+                        {l.url.replace(/^https?:\/\//, "")}
+                      </a>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="wrap foot">
+        <span>{profile.name}</span>
+        <span>{new Date().getFullYear()}</span>
       </footer>
     </div>
   );
