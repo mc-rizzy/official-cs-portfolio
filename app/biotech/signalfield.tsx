@@ -34,7 +34,8 @@ export default function SignalField() {
     const signal = col("--signal");
     const rule = col("--rule");
     const font = style.fontFamily;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const root = canvas.closest<HTMLElement>(".bio");
+    const reduce = root?.dataset.motion === "off"; // /biotech?motion=off
     const hint = window.matchMedia("(pointer: coarse)").matches
       ? "Drag across the signal"
       : "Move across the signal";

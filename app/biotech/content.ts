@@ -137,14 +137,14 @@ export const content: Content = {
       tags: ["python", "etl", "health records", "automation", "data cleaning"],
     },
     {
-      id: "ibm",
-      title: "IBM research collaboration",
+      id: "rpi",
+      title: "EEG Robotics Biotechnology",
       kind: "Research",
       stage: "Collaboration",
       role: "Research collaborator",
       summary:
         "Contributed to work on neural computing and brain-inspired architectures, applying deep learning to structured biomedical data and hardware-accelerated inference.",
-      tags: ["ibm", "neural computing", "bioml", "inference", "deep learning"],
+      tags: ["rpi", "neural computing", "bioml", "inference", "deep learning", "eeg"],
     },
     {
       id: "whitepaper",
@@ -199,7 +199,7 @@ export const content: Content = {
       group: "Biotech domain",
       items: [
         { name: "EEG", level: 3 },
-        { name: "Signal processing", level: 3 },
+        { name: "Signal processing", level: 2 },
         { name: "Artifact rejection", level: 2 },
         { name: "Clinical data", level: 2 },
       ],
@@ -208,9 +208,9 @@ export const content: Content = {
 
   background: [
     { org: "Rensselaer Polytechnic Institute", role: "Computer Science major", kind: "Education" },
-    { org: "IBM", role: "Research collaborator", kind: "Research", note: "Neural computing and brain-inspired architectures." },
+    { org: "EEG Robotics Biotechnology", role: "AI/ML and Data Analysis Researcher", kind: "Research", note: "Neural computing and brain-inspired architectures." },
     { org: "RPI Union", role: "Full-stack engineer", kind: "Engineering" },
-    { org: "HackRPI", role: "Executive board", kind: "Leadership", note: "Runs the hackathon; built the event website." },
+    { org: "HackRPI", role: "Director of Technology", kind: "Leadership", note: "Runs the hackathon and tech team; built the event website; Run event statistical analysis." },
   ],
 
   contact: {

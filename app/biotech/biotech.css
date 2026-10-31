@@ -290,11 +290,8 @@
   .foot { flex-direction: column; }
 }
 
-/* ---------- Reduced motion ----------
-   Only the looping pulses stop. Short hover transitions and one-shot
-   reveals stay. The canvases check the same media query in JS.
-   Open /biotech?motion=full to override. */
-/* @media (prefers-reduced-motion: reduce) {
-  .bio:not([data-motion="full"]) .status::before,
-  .bio:not([data-motion="full"]) .steps li[data-state="active"]::before { animation: none; }
-} */
+/* ---------- Motion ----------
+   Canvases and pulses animate by default. Open /biotech?motion=off for a
+   fully still page. */
+.bio[data-motion="off"] .status::before,
+.bio[data-motion="off"] .steps li[data-state="active"]::before { animation: none; }
