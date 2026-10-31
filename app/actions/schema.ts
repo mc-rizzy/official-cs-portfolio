@@ -63,7 +63,7 @@ export type PageTailoring = z.infer<typeof pageTailorSchema>;
 /* Skills the posting asks for that the candidate has not listed are NOT
    added by default: that would claim proficiency on a public page.
    Flip to true to show them in an extra group at full bars. */
-export const ALLOW_UNLISTED_SKILLS = false;
+export const ALLOW_UNLISTED_SKILLS = true;
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9+#]+/g, " ").trim();
 

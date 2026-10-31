@@ -3,7 +3,7 @@
 // Playwright and uses your Groq key). It is deliberately NOT a 'use server'
 // file, so it is never exposed as a public endpoint.
 
-import { generateObject } from 'ai';
+import { generateText, Output } from 'ai';
 import { createGroq } from '@ai-sdk/groq';
 import { pageTailorSchema, applyPageTailoring, type PageTailoring } from './schema';
 import { scrapeProtectedPage } from './scrape';
@@ -63,9 +63,9 @@ async function generate(url: string, base: Content): Promise<PageTailoring> {
     background: base.background,
   };
 
-  const { object } = await generateObject({
+  const { output: object } = await generateText({
     model: groq(MODEL),
-    schema: pageTailorSchema,
+    output: Output.object({ schema: pageTailorSchema }),
     system: SYSTEM,
     abortSignal: AbortSignal.timeout(30_000),
     prompt: `
