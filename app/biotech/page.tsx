@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./biotech.css";
-import SignalField from "./SignalField";
+import SignalField from "./signalfield";
+import NeuralField from "./neuralfield";
 import PageEffects from "./PageEffects";
 import ContactCard from "./ContactCard";
-import { content } from "./Content";
+import { content } from "./content";
 import { applyLens, resolveLens } from "./tailor";
 
 export const metadata: Metadata = {
@@ -21,14 +22,15 @@ const vars = (v: Record<string, number>) => v as unknown as React.CSSProperties;
 export default async function BiotechPage({
   searchParams,
 }: {
-  searchParams: Promise<{ for?: string }>;
+  searchParams: Promise<{ for?: string; motion?: string }>;
 }) {
-  const { for: lensKey } = await searchParams;
+  const { for: lensKey, motion } = await searchParams;
   const c = applyLens(content, resolveLens(lensKey));
   const { profile, current, projects, skills, background, contact } = c;
 
   return (
-    <div className="bio">
+    <div className="bio" data-motion={motion}>
+      <NeuralField />
       <PageEffects />
 
       <header className="top">
