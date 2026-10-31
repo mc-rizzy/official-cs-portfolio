@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./biotech.css";
-import SignalField from "./SignalField";
-import NeuralField from "./NeuralField";
+import SignalField from "./signalfield";
+import NeuralField from "./neuralfield";
 import PageEffects from "./PageEffects";
 import ContactCard from "./ContactCard";
 import { content } from "./content";
 import { applyLens, resolveLens } from "./tailor";
 import { tailorContent } from "../actions/tailor-page";
-import { first, jobUrlFromParams } from "./jobUrl";
+import { first, jobUrlFromParams } from "./joburl";
 
 // Tailoring scrapes a job page and calls a model; allow time on hosts that cap it.
 export const maxDuration = 60;
