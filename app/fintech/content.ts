@@ -51,6 +51,7 @@ export const content: Content = {
         "A functioning blockchain node with a Flask REST API, SHA-256 proof of work, node consensus resolution, and a test suite.",
       outcome: "Under 10 ms per block.",
       tags: ["python", "flask", "rest api", "cryptography", "sha-256", "blockchain", "consensus"],
+      articleId: "python-blockchain",
       links: [{ label: "Code", url: "https://github.com/mc-rizzy/python-blockchain" }],
     },
     {
@@ -62,6 +63,7 @@ export const content: Content = {
       summary:
         "A budgeting app that tracks daily earnings against a weekly profit goal and splits income across savings, index investing, deposits, and spending, with a Sankey diagram of where each dollar goes.",
       tags: ["next.js", "typescript", "react", "data visualization", "budgeting"],
+      articleId: "budgeter",
       links: [{ label: "Live demo", url: "/budgeter" }],
     },
     {
