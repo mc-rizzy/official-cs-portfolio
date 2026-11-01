@@ -1,0 +1,8 @@
+/* Fintech theme: same layout as /biotech (biotech.css), different palette. */
+.bio.fin {
+  --paper: #0d1011;
+  --plate: #151a1c;
+  --rule: #262d30;
+  --muted: #858f93;
+  --signal: #e3b04b;
+}

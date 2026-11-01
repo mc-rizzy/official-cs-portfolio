@@ -31,13 +31,13 @@ export const pageTailorSchema = z.object({
   company: z.string().describe("Employer name. Empty string if unknown."),
   jobTitle: z.string().describe("Job title as written in the posting, e.g. 'Software Engineer Intern'."),
   headline: z.string().describe(
-    "Hero headline in first person, plain words, max 7 words, no hype. Must be true of the candidate. Example style: 'I build software for biotech.'"
+    "Hero headline in first person, plain words, max 7 words, no hype. Must be true of the candidate. Example style: 'I build reliable software for payments.'"
   ),
   summary: z.string().describe(
     "2 sentences, max 300 characters, first person. Connect the candidate's real work to what this job needs. Facts only from the candidate data."
   ),
   roles: z.string().describe("Roles line using the job's function, e.g. 'Software and machine learning engineering'. Max 70 characters."),
-  domain: z.string().describe("The employer's industry or domain, 2-5 words, e.g. 'Neurotechnology and medical devices'."),
+  domain: z.string().describe("The employer's industry or domain, 2-5 words, e.g. 'Payments infrastructure' or 'Medical devices'."),
   location: z.string().describe("Job location as 'City, State' or 'Remote'. Empty string if the posting does not say."),
   contactBlurb: z.string().describe("1-2 sentences, max 180 characters, saying the candidate is interested in this role. Mention the company if known."),
   currentWork: z.string().describe(
@@ -53,7 +53,7 @@ export const pageTailorSchema = z.object({
       summary: z.string().describe(
         "Rephrased summary, max 350 characters. Use the posting's terminology only where the candidate really did that work. Never invent technologies, results, or numbers."
       ),
-      relevance: z.number().describe("0 to 10: how relevant this project is to the posting."),
+      relevance: z.number().describe("0 to 10: how relevant this project is to the posting, favoring the page focus given in the instructions."),
     })
   ).describe("One entry for EVERY candidate project."),
 });
@@ -63,7 +63,7 @@ export type PageTailoring = z.infer<typeof pageTailorSchema>;
 /* Skills the posting asks for that the candidate has not listed are NOT
    added by default: that would claim proficiency on a public page.
    Flip to true to show them in an extra group at full bars. */
-export const ALLOW_UNLISTED_SKILLS = true;
+export const ALLOW_UNLISTED_SKILLS = false;
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9+#]+/g, " ").trim();
 

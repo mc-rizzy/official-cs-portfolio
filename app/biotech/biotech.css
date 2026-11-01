@@ -131,7 +131,7 @@
 }
 .plate:hover {
   border-color: color-mix(in srgb, var(--signal) 55%, var(--rule));
-  box-shadow: 0 14px 40px -18px rgb(123 147 255 / 0.4);
+  box-shadow: 0 14px 40px -18px color-mix(in srgb, var(--signal) 40%, transparent);
   transform: translateY(-2px);
 }
 .status { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 500; color: var(--ink); }
@@ -159,8 +159,8 @@
 .plate-links { display: flex; gap: 1.25rem; margin: 1.25rem 0 0; font-size: 0.9rem; color: var(--signal); }
 
 @keyframes beat {
-  0% { box-shadow: 0 0 0 0 rgb(123 147 255 / 0.55); }
-  70%, 100% { box-shadow: 0 0 0 0.6rem rgb(123 147 255 / 0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--signal) 55%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 0.6rem color-mix(in srgb, var(--signal) 0%, transparent); }
 }
 
 /* ---------- Projects and background rows ---------- */
@@ -171,7 +171,7 @@
 .proj:first-child, .bg-row:first-child { border-top: 0; padding-top: 0; }
 /* Row wash sweeps in from the left, accent bar grows down the edge */
 .proj {
-  background: linear-gradient(90deg, rgb(123 147 255 / 0.08), transparent 75%) 0 0 / 0% 100% no-repeat;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--signal) 8%, transparent), transparent 75%) 0 0 / 0% 100% no-repeat;
   transition: background-size var(--t-slow) var(--ease);
 }
 .proj:hover, .proj:focus-within { background-size: 100% 100%; }
@@ -223,7 +223,7 @@
   transition: border-color var(--t-med) ease, box-shadow var(--t-med) ease;
 }
 .card:hover, .card:focus-within { border-color: color-mix(in srgb, var(--signal) 55%, var(--rule)); }
-.card:focus-within { box-shadow: 0 14px 40px -18px rgb(123 147 255 / 0.4); }
+.card:focus-within { box-shadow: 0 14px 40px -18px color-mix(in srgb, var(--signal) 40%, transparent); }
 .card h3 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 0.5rem; }
 .card-note { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
 

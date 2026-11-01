@@ -7,7 +7,7 @@
 export interface Project {
   id: string;
   title: string;
-  kind: "Machine learning" | "Data engineering" | "Software" | "Research" | "Writing";
+  kind: string; // e.g. "Machine learning", "Data engineering", "Blockchain"
   stage?: string; // timeless status, e.g. "Completed", "Ongoing"
   role?: string;
   summary: string;
@@ -16,23 +16,23 @@ export interface Project {
   articleId?: string; // links to /articles/[id]
   links?: { label: string; url: string }[];
 }
-
+ 
 export interface Skill {
   name: string;
   level: 1 | 2 | 3; // 3 = daily, 2 = working, 1 = familiar
   focus?: boolean; // set by tailoring, not by hand
 }
-
+ 
 export interface SkillGroup {
   group: string;
   items: Skill[];
 }
-
+ 
 export interface Milestone {
   label: string;
   state: "done" | "active" | "planned";
 }
-
+ 
 export interface Content {
   profile: {
     name: string;
