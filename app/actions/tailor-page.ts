@@ -6,7 +6,7 @@
 import { generateText, Output } from 'ai';
 import { createGroq } from '@ai-sdk/groq';
 import { pageTailorSchema, applyPageTailoring, type PageTailoring } from './schema';
-import { scrapeProtectedPage } from './scrape';
+import { scrapeStaticPage } from './job-text';
 import { parseJobUrl } from '../biotech/joburl';
 import type { Content } from '../biotech/content';
 
@@ -16,7 +16,8 @@ const MODEL = 'openai/gpt-oss-20b'; // 'openai/gpt-oss-120b' for heavier reasoni
 const TTL_OK = 24 * 60 * 60 * 1000; // reuse a successful result for a day
 const TTL_FAIL = 5 * 60 * 1000; // don't retry a failing link for 5 minutes
 const MAX_NEW_PER_HOUR = 20; // cap on uncached scrape + LLM runs (per server instance)
-const MAX_JD_CHARS = 12000;
+const MAX_JD_CHARS = 100_000; // guard against a pathological page only; real postings are far smaller
+const MAX_OUTPUT_TOKENS = 8000; // gpt-oss spends part of this on reasoning, so leave plenty of room
 
 const SYSTEM = `You tailor a computer science student's portfolio page to one job posting.
 Rules:
@@ -54,12 +55,26 @@ const withTimeout = <T,>(p: Promise<T>, ms: number) =>
     new Promise<never>((_, rej) => setTimeout(() => rej(new Error(`timed out after ${ms}ms`)), ms)),
   ]);
 
+/* Headless browser first (handles JavaScript-rendered boards). If it is missing
+   or cannot launch (typical on serverless hosts), read the page with a plain
+   fetch instead. Playwright is imported lazily so it can never break module load. */
+async function readPosting(url: string): Promise<{ title: string; content: string }> {
+  try {
+    const { scrapeProtectedPage } = await import('./scrape');
+    const job = await withTimeout(scrapeProtectedPage(url), 30_000);
+    if (job.content.length >= 300) return job;
+  } catch (err) {
+    console.error('[tailor] headless scrape unavailable:', err instanceof Error ? err.message : err);
+  }
+  return withTimeout(scrapeStaticPage(url), 20_000);
+}
+
 async function generate(key: string, base: Content): Promise<PageTailoring> {
   if (!allowNewRun()) throw new Error('hourly tailoring limit reached');
 
   const scope = key.slice(0, key.indexOf('|'));
   const url = key.slice(key.indexOf('|') + 1);
-  const job = await withTimeout(scrapeProtectedPage(url), 30_000);
+  const job = await readPosting(url);
   const text = job.content.slice(0, MAX_JD_CHARS);
   if (text.length < 300) throw new Error('job page too short (blocked, expired, or not a posting)');
 
@@ -77,6 +92,8 @@ async function generate(key: string, base: Content): Promise<PageTailoring> {
   const { output: object } = await generateText({
     model: groq(MODEL),
     output: Output.object({ schema: pageTailorSchema }),
+    maxOutputTokens: MAX_OUTPUT_TOKENS,
+    providerOptions: { groq: { reasoningEffort: 'low' } }, // less hidden reasoning, more room for the JSON
     system: FOCUS[scope] ? `${SYSTEM}\n${FOCUS[scope]}` : SYSTEM,
     abortSignal: AbortSignal.timeout(30_000),
     prompt: `

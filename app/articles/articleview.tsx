@@ -2,8 +2,6 @@ import Link from "next/link";
 import ArticleShell from "./articleshell";
 import ArticleEffects from "./articleeffects";
 import ArticleRow from "./articlerow";
-import SignalField from "../biotech/signalfield";
-import MarketField from "../fintech/marketfield";
 import { readingTime, relatedTo, type Article, type Block } from "./data";
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -193,7 +191,6 @@ export default function ArticleView({ article }: { article: Article }) {
             <span>{article.tags.join(", ")}</span>
           </div>
         </div>
-        <div className="art-field">{article.theme === "fintech" ? <MarketField /> : <SignalField />}</div>
       </section>
 
       <div className="wrap art-layout">

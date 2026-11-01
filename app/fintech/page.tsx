@@ -4,7 +4,7 @@ import MarketField from "./marketfield";
 import ChartField from "./chartfield";
 import PortfolioView from "../biotech/portfolioview";
 import { content } from "./content";
-import { tailorContent } from "../actions/tailor-page";
+import { tailorIfRequested } from "../actions/tailor-lazy";
 import { first, jobUrlFromParams } from "../biotech/joburl";
 
 // Tailoring scrapes a job page and calls a model; allow time on hosts that cap it.
@@ -25,7 +25,7 @@ export default async function FintechPage({
 
   // /fintech?v=<job url> tailors the page; any failure falls back to `content`.
   const jobUrl = jobUrlFromParams(sp);
-  const c = jobUrl ? await tailorContent(content, jobUrl, "fintech") : content;
+  const c = jobUrl ? await tailorIfRequested(content, jobUrl, "fintech") : content;
 
   return (
     <PortfolioView

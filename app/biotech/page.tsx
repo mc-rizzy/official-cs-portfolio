@@ -4,7 +4,7 @@ import NeuralField from "./neuralfield";
 import PortfolioView from "./portfolioview";
 import { content } from "./content";
 import { applyLens, resolveLens } from "./tailor";
-import { tailorContent } from "../actions/tailor-page";
+import { tailorIfRequested } from "../actions/tailor-lazy";
 import { first, jobUrlFromParams } from "./joburl";
 
 // Tailoring scrapes a job page and calls a model; allow time on hosts that cap it.
@@ -26,7 +26,7 @@ export default async function BiotechPage({
 
   // /biotech?v=<job url> tailors the page; any failure falls back to `base`.
   const jobUrl = jobUrlFromParams(sp);
-  const c = jobUrl ? await tailorContent(base, jobUrl, "biotech") : base;
+  const c = jobUrl ? await tailorIfRequested(base, jobUrl, "biotech") : base;
 
   return (
     <PortfolioView

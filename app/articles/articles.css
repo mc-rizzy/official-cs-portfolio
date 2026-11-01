@@ -1,6 +1,17 @@
 /* Article pages. Builds on biotech.css (variables, .top, .wrap, .foot, .ulink)
    and picks up the fintech palette through the .fin class. */
 
+/* ---------- Article palette ----------
+   Neutral graphite instead of the portfolio's blue-black, so article pages
+   read as a different place. Accent colors still come from .bio / .bio.fin. */
+.bio.art {
+  --paper: #131417;
+  --plate: #1b1d21;
+  --rule: #2b2e34;
+  --muted: #8b9199;
+  --body: #bdc3ca;
+}
+
 /* ---------- Reading progress ---------- */
 .art-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 60; pointer-events: none; }
 .art-progress i { display: block; height: 100%; background: var(--signal); transform: scaleX(0); transform-origin: left; }
@@ -43,7 +54,7 @@
 .art-hero h1 { font-weight: 600; font-size: clamp(2.2rem, 5.6vw, 4.4rem); line-height: 1.02; letter-spacing: -0.03em; margin: 0 0 1.25rem; max-width: 20ch; }
 .art-sub { max-width: 62ch; font-size: 1.15rem; }
 .art-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.5rem; margin-top: 1.25rem; font-size: 0.85rem; color: var(--muted); }
-.art-field { position: relative; height: clamp(180px, 26vh, 260px); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.art-hero { border-bottom: 1px solid var(--rule); }
 
 /* ---------- Layout ---------- */
 .art-layout {

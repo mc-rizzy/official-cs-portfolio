@@ -2,6 +2,8 @@ import Link from "next/link";
 import "../biotech/biotech.css";
 import "../fintech/fintech.css";
 import "./articles.css";
+import NeuralField from "../biotech/neuralfield";
+import ChartField from "../fintech/chartfield";
 
 /* Shared frame for every /articles route: theme, top bar, footer. */
 export default function ArticleShell({
@@ -14,7 +16,8 @@ export default function ArticleShell({
   progress?: boolean;
 }) {
   return (
-    <div className={`bio ${theme === "fintech" ? "fin" : ""}`}>
+    <div className={`bio art ${theme === "fintech" ? "fin" : ""}`}>
+      {theme === "fintech" ? <ChartField /> : <NeuralField />}
       {progress && (
         <div className="art-progress" aria-hidden="true">
           <i />
